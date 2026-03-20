@@ -17,13 +17,7 @@ interface Noticia {
   created_at: string;
 }
 
-const mockNoticias: Noticia[] = [
-  { id: "1", titulo: "Nova escola será construída no Mangueiral", descricao: "Previsão de entrega para 2025", link: "https://example.com/escola", status: "pendente", created_at: "2024-03-10" },
-  { id: "2", titulo: "Obras de pavimentação concluídas na Quadra 7", descricao: "As obras foram finalizadas com sucesso", link: null, status: "aprovado", created_at: "2024-03-05" },
-  { id: "3", titulo: "Campanha de vacinação no posto de saúde", descricao: null, link: "https://example.com/vacinacao", status: "aprovado", created_at: "2024-02-28" },
-  { id: "4", titulo: "Feira de empreendedores locais", descricao: "Evento para divulgação de negócios locais", link: null, status: "rejeitado", created_at: "2024-02-20" },
-  { id: "5", titulo: "Novo ponto de ônibus inaugurado", descricao: "Linha 123 agora passa pelo Mangueiral", link: null, status: "pendente", created_at: "2024-03-12" },
-];
+const mockNoticias: Noticia[] = [];
 
 export default function AdminNoticias() {
   const [noticias, setNoticias] = useState<Noticia[]>(mockNoticias);

@@ -18,13 +18,7 @@ interface Cliente {
   imoveis_count: number;
 }
 
-const mockClientes: Cliente[] = [
-  { id: "1", nome: "Maria Silva", email: "maria@email.com", telefone: "(61) 99999-1111", created_at: "2024-01-15", imoveis_count: 2 },
-  { id: "2", nome: "João Santos", email: "joao@email.com", telefone: "(61) 99999-2222", created_at: "2024-01-10", imoveis_count: 1 },
-  { id: "3", nome: "Ana Oliveira", email: "ana@email.com", telefone: "(61) 99999-3333", created_at: "2024-02-05", imoveis_count: 0 },
-  { id: "4", nome: "Carlos Lima", email: "carlos@email.com", telefone: "(61) 99999-4444", created_at: "2024-02-20", imoveis_count: 3 },
-  { id: "5", nome: "Fernanda Costa", email: "fernanda@email.com", telefone: "(61) 99999-5555", created_at: "2024-03-01", imoveis_count: 1 },
-];
+const mockClientes: Cliente[] = [];
 
 export default function AdminClientes() {
   const [clientes] = useState<Cliente[]>(mockClientes);

@@ -8,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Home, CheckCircle, XCircle, Clock, Building, CalendarDays, Handshake, Users, Tag, MessageCircle, MapPin, Newspaper } from "lucide-react";
 
 export default function AdminDashboard() {
-  const [stats] = useState({ total: 24, pendentes: 3, aprovados: 18, rejeitados: 3 });
-  const [parceiroStats] = useState({ total: 12, pendentes: 2 });
+  const [stats] = useState({ total: 0, pendentes: 0, aprovados: 0, rejeitados: 0 });
+  const [parceiroStats] = useState({ total: 0, pendentes: 0 });
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

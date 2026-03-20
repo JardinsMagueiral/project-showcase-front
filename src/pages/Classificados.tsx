@@ -5,12 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Tag } from "lucide-react";
 
-const mockClassificados = [
-  { id: "1", titulo: "Sofá 3 lugares", preco: 800, categoria: "Móveis" },
-  { id: "2", titulo: "iPhone 14 Pro", preco: 4500, categoria: "Eletrônicos" },
-  { id: "3", titulo: "Bicicleta aro 29", preco: 1200, categoria: "Esportes" },
-  { id: "4", titulo: "Geladeira Brastemp", preco: 2000, categoria: "Eletrodomésticos" },
-];
+const mockClassificados: { id: string; titulo: string; preco: number; categoria: string }[] = [];
 
 const formatPrice = (price: number) => price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 

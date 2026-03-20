@@ -48,21 +48,9 @@ function SortableQuadraPhoto({ foto, onDelete }: { foto: QuadraFoto; onDelete: (
   );
 }
 
-const mockQuadras: Quadra[] = Array.from({ length: 12 }, (_, i) => ({
-  id: String(i + 1),
-  numero: i + 1,
-  nome: `Quadra ${String(i + 1).padStart(2, "0")}`,
-  telefone: `(61) 3333-${String(1000 + i)}`,
-  email: `quadra${i + 1}@mangueiral.com`,
-  taxa_condominio: 280 + i * 15,
-}));
+const mockQuadras: Quadra[] = [];
 
-const mockFotos: Record<string, QuadraFoto[]> = {
-  "1": [
-    { id: "f1", url: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=300", ordem: 0 },
-    { id: "f2", url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300", ordem: 1 },
-  ],
-};
+const mockFotos: Record<string, QuadraFoto[]> = {};
 
 export default function AdminQuadras() {
   const [quadras, setQuadras] = useState<Quadra[]>(mockQuadras);

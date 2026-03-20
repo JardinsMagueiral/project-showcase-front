@@ -2,13 +2,7 @@ import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-const groups = [
-  { id: "1", titulo: "Grupo Geral", descricao: "Informações gerais da comunidade", link: "https://chat.whatsapp.com/GH1XuLDJfKP4be24ullSCD" },
-  { id: "2", titulo: "Compra e Venda", descricao: "Negocie imóveis e itens", link: "#" },
-  { id: "3", titulo: "Serviços", descricao: "Encontre prestadores de serviço", link: "#" },
-  { id: "4", titulo: "Mães e Pais", descricao: "Grupo de pais da comunidade", link: "#" },
-  { id: "5", titulo: "Esportes", descricao: "Atividades esportivas no bairro", link: "#" },
-];
+const groups: { id: string; titulo: string; descricao: string; link: string }[] = [];
 
 export function WhatsAppGroups() {
   return (

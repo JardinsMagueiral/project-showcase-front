@@ -4,15 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Newspaper, MessageCircle, ExternalLink } from "lucide-react";
-import escolaImg from "@/assets/news/escola-mangueiral.jpg";
-import bairroImg from "@/assets/news/bairro-transformacao.jpg";
-
-const NOTICIAS_EXTERNAS = [
-  { titulo: "Ibaneis inaugura escola no Jardins Mangueiral", fonte: "Metrópoles", link: "#", imagem: escolaImg },
-  { titulo: "Jardim Mangueiral ganha nova escola pública", fonte: "R7", link: "#", imagem: escolaImg },
-  { titulo: "GDF inaugura escola nos Jardins Mangueiral", fonte: "R7", link: "#", imagem: escolaImg },
-  { titulo: "Jardins Mangueiral, um bairro em transformação", fonte: "Instagram", link: "#", imagem: bairroImg },
-];
+const NOTICIAS_EXTERNAS: { titulo: string; fonte: string; link: string; imagem: string }[] = [];
 
 export default function Noticias() {
   return (
