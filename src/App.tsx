@@ -17,6 +17,17 @@ import Classificados from "./pages/Classificados";
 import ClassificadoDetalhe from "./pages/ClassificadoDetalhe";
 import QuadraDetalhe from "./pages/QuadraDetalhe";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminImoveis from "./pages/admin/AdminImoveis";
+import AdminNovoImovel from "./pages/admin/AdminNovoImovel";
+import AdminEditarImovel from "./pages/admin/AdminEditarImovel";
+import AdminEventos from "./pages/admin/AdminEventos";
+import AdminParceiros from "./pages/admin/AdminParceiros";
+import AdminClassificados from "./pages/admin/AdminClassificados";
+import AdminClientes from "./pages/admin/AdminClientes";
+import AdminNoticias from "./pages/admin/AdminNoticias";
+import AdminGrupos from "./pages/admin/AdminGrupos";
+import AdminQuadras from "./pages/admin/AdminQuadras";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +51,17 @@ const App = () => (
           <Route path="/contato" element={<Contato />} />
           <Route path="/classificados" element={<Classificados />} />
           <Route path="/classificados/:id" element={<ClassificadoDetalhe />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/imoveis" element={<AdminImoveis />} />
+          <Route path="/admin/novo-imovel" element={<AdminNovoImovel />} />
+          <Route path="/admin/imoveis/:id/editar" element={<AdminEditarImovel />} />
+          <Route path="/admin/eventos" element={<AdminEventos />} />
+          <Route path="/admin/parceiros" element={<AdminParceiros />} />
+          <Route path="/admin/classificados" element={<AdminClassificados />} />
+          <Route path="/admin/clientes" element={<AdminClientes />} />
+          <Route path="/admin/noticias" element={<AdminNoticias />} />
+          <Route path="/admin/grupos" element={<AdminGrupos />} />
+          <Route path="/admin/quadras" element={<AdminQuadras />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
