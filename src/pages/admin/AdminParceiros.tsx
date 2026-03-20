@@ -29,9 +29,6 @@ interface Parceiro {
 }
 
 const mockParceiros: Parceiro[] = [];
-  { id: "3", nome: "Mecânica do Zé", categoria: "Automotivo", descricao: "Serviços mecânicos em geral", telefone: "(61) 3333-3333", email: "ze@mecanica.com", instagram: null, site: null, endereco: null, logo_url: null, status: "aprovado", destaque: false },
-  { id: "4", nome: "Salão Beleza Pura", categoria: "Beleza", descricao: null, telefone: "(61) 3333-4444", email: null, instagram: "belezapura", site: null, endereco: "Quadra 1, Loja 3", logo_url: null, status: "rejeitado", destaque: false },
-];
 
 export default function AdminParceiros() {
   const { toast } = useToast();

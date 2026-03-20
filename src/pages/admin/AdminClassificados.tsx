@@ -20,11 +20,6 @@ interface Classificado {
 }
 
 const mockClassificados: Classificado[] = [];
-  { id: "2", titulo: "Bicicleta aro 29", preco: 1200, categoria: "Esportes", status: "aprovado", profiles: { nome: "João Santos" } },
-  { id: "3", titulo: "iPhone 13 128GB", preco: 3500, categoria: "Eletrônicos", status: "aprovado", profiles: { nome: "Ana Oliveira" } },
-  { id: "4", titulo: "Mesa de escritório", preco: 350, categoria: "Móveis", status: "rejeitado", profiles: { nome: "Carlos Lima" } },
-  { id: "5", titulo: "Roupas infantis (lote)", preco: 150, categoria: "Roupas", status: "pendente", profiles: { nome: "Fernanda Costa" } },
-];
 
 export default function AdminClassificados() {
   const [classificados, setClassificados] = useState<Classificado[]>(mockClassificados);

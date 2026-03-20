@@ -19,10 +19,6 @@ interface Evento {
 }
 
 const mockEventos: Evento[] = [];
-  { id: "3", data: "2024-05-10", titulo: "Reunião de Moradores", descricao: "Reunião mensal para discussão de pautas do condomínio", status: "aprovado" },
-  { id: "4", data: "2024-03-25", titulo: "Bazar Solidário", descricao: null, status: "rejeitado" },
-  { id: "5", data: "2024-06-01", titulo: "Dia das Crianças Antecipado", descricao: "Evento com brinquedos infláveis e brincadeiras", status: "pendente" },
-];
 
 export default function AdminEventos() {
   const [eventos, setEventos] = useState<Evento[]>(mockEventos);
