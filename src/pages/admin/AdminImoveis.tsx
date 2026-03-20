@@ -27,12 +27,7 @@ interface Imovel {
   profiles: { nome: string; email: string; telefone: string } | null;
 }
 
-const mockImoveis: Imovel[] = [
-  { id: "1", tipo: "casa", operacao: "venda", endereco: "Quadra 1, Conjunto A, Casa 12", bairro: "Jardins Mangueiral", preco: 450000, quartos: 3, status: "pendente", destaque: false, created_at: "2024-01-15", profiles: { nome: "Maria Silva", email: "maria@email.com", telefone: "(61) 99999-1111" } },
-  { id: "2", tipo: "apartamento", operacao: "aluguel", endereco: "Quadra 3, Bloco B, Apto 204", bairro: "Jardins Mangueiral", preco: 1800, quartos: 2, status: "aprovado", destaque: true, created_at: "2024-01-10", profiles: { nome: "João Santos", email: "joao@email.com", telefone: "(61) 99999-2222" } },
-  { id: "3", tipo: "casa", operacao: "venda", endereco: "Quadra 5, Conjunto C, Casa 8", bairro: "Jardins Mangueiral", preco: 520000, quartos: 4, status: "aprovado", destaque: false, created_at: "2024-01-08", profiles: { nome: "Ana Oliveira", email: "ana@email.com", telefone: "(61) 99999-3333" } },
-  { id: "4", tipo: "terreno", operacao: "venda", endereco: "Quadra 8, Lote 15", bairro: "Jardins Mangueiral", preco: 180000, quartos: 0, status: "rejeitado", destaque: false, created_at: "2024-01-05", profiles: { nome: "Carlos Lima", email: "carlos@email.com", telefone: "(61) 99999-4444" } },
-];
+const mockImoveis: Imovel[] = [];
 
 export default function AdminImoveis() {
   const [imoveis, setImoveis] = useState<Imovel[]>(mockImoveis);

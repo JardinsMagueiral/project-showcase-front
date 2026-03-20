@@ -28,9 +28,7 @@ interface Parceiro {
   destaque: boolean;
 }
 
-const mockParceiros: Parceiro[] = [
-  { id: "1", nome: "Padaria Pão Quente", categoria: "Alimentação", descricao: "Padaria artesanal com pães frescos todos os dias", telefone: "(61) 3333-1111", email: "contato@paoquente.com", instagram: "paoquente", site: null, endereco: "Quadra 2, Loja 5", logo_url: null, status: "pendente", destaque: false },
-  { id: "2", nome: "Pet Shop Amigo Fiel", categoria: "Pet Shop", descricao: "Banho, tosa e rações", telefone: "(61) 3333-2222", email: null, instagram: "amigofiel", site: "https://amigofiel.com", endereco: "Quadra 4, Loja 12", logo_url: null, status: "aprovado", destaque: true },
+const mockParceiros: Parceiro[] = [];
   { id: "3", nome: "Mecânica do Zé", categoria: "Automotivo", descricao: "Serviços mecânicos em geral", telefone: "(61) 3333-3333", email: "ze@mecanica.com", instagram: null, site: null, endereco: null, logo_url: null, status: "aprovado", destaque: false },
   { id: "4", nome: "Salão Beleza Pura", categoria: "Beleza", descricao: null, telefone: "(61) 3333-4444", email: null, instagram: "belezapura", site: null, endereco: "Quadra 1, Loja 3", logo_url: null, status: "rejeitado", destaque: false },
 ];

@@ -6,12 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, MessageCircle, Tag } from "lucide-react";
 
-const mockClassificados = [
-  { id: "1", titulo: "Sofá 3 lugares", descricao: "Sofá em ótimo estado, cor cinza, pouco uso.", preco: 800, categoria: "Móveis", contato_whatsapp: "61999999999" },
-  { id: "2", titulo: "iPhone 13 Pro", descricao: "128GB, bateria 92%, com caixa e acessórios.", preco: 3500, categoria: "Eletrônicos", contato_whatsapp: "61988888888" },
-  { id: "3", titulo: "Bicicleta Caloi Aro 29", descricao: "Mountain bike em ótimo estado.", preco: 1200, categoria: "Esportes", contato_whatsapp: "61977777777" },
-  { id: "4", titulo: "Máquina de Lavar 12kg", descricao: "Electrolux, funciona perfeitamente.", preco: 900, categoria: "Eletrodomésticos", contato_whatsapp: "61966666666" },
-];
+const mockClassificados: { id: string; titulo: string; descricao: string; preco: number; categoria: string; contato_whatsapp: string }[] = [];
 
 export default function ClassificadoDetalhe() {
   const { id } = useParams();

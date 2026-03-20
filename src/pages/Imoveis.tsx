@@ -6,12 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Building, MessageCircle, Key, Bed, Bath, Car, Maximize } from "lucide-react";
 
-const mockImoveis = [
-  { id: "1", tipo: "casa", operacao: "venda", endereco: "Quadra 01, Conjunto A", bairro: "Jardins Mangueiral", preco: 450000, quartos: 3, banheiros: 2, vagas: 2, area_m2: 120 },
-  { id: "2", tipo: "apartamento", operacao: "aluguel", endereco: "Quadra 05, Bloco B", bairro: "Jardins Mangueiral", preco: 2500, quartos: 2, banheiros: 1, vagas: 1, area_m2: 65 },
-  { id: "3", tipo: "casa", operacao: "venda", endereco: "Quadra 08, Conjunto C", bairro: "Jardins Mangueiral", preco: 380000, quartos: 2, banheiros: 2, vagas: 1, area_m2: 90 },
-  { id: "4", tipo: "apartamento", operacao: "venda", endereco: "Quadra 12, Bloco D", bairro: "Jardins Mangueiral", preco: 320000, quartos: 2, banheiros: 1, vagas: 1, area_m2: 55 },
-];
+const mockImoveis: { id: string; tipo: string; operacao: string; endereco: string; bairro: string; preco: number; quartos: number; banheiros: number; vagas: number; area_m2: number }[] = [];
 
 const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(price);
 

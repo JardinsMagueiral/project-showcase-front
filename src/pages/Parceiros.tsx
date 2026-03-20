@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Handshake, Wrench, Building2, UserPlus, MessageCircle, Phone } from "lucide-react";
 
-const mockParceiros = [
-  { id: "1", nome: "Padaria do João", categoria: "Alimentação", descricao: "Pães artesanais e confeitaria", telefone: "61999999999" },
-  { id: "2", nome: "Elétrica Mangueiral", categoria: "Serviços Domésticos", descricao: "Serviços elétricos em geral", telefone: "61988888888" },
-  { id: "3", nome: "Pet Shop Amigo", categoria: "Pet", descricao: "Banho, tosa e veterinário", telefone: "61977777777" },
-];
+const mockParceiros: { id: string; nome: string; categoria: string; descricao: string; telefone: string }[] = [];
 
 const Parceiros = () => {
   return (

@@ -6,11 +6,7 @@ import { CalendarDays, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const mockEventos = [
-  { id: "1", data: format(new Date(), "yyyy-MM-dd"), titulo: "Feira de Artesanato", descricao: "Feira mensal de artesanato na praça central" },
-  { id: "2", data: format(new Date(Date.now() + 86400000 * 3), "yyyy-MM-dd"), titulo: "Reunião de Moradores", descricao: "Pauta: segurança e infraestrutura" },
-  { id: "3", data: format(new Date(Date.now() + 86400000 * 7), "yyyy-MM-dd"), titulo: "Torneio de Futebol", descricao: "Campeonato entre quadras" },
-];
+const mockEventos: { id: string; data: string; titulo: string; descricao: string }[] = [];
 
 export function EventsCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());

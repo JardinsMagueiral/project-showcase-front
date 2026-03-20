@@ -18,9 +18,7 @@ interface Evento {
   status: string;
 }
 
-const mockEventos: Evento[] = [
-  { id: "1", data: "2024-03-15", titulo: "Festa Junina do Mangueiral", descricao: "Festa junina com comidas típicas e quadrilha", status: "pendente" },
-  { id: "2", data: "2024-04-20", titulo: "Mutirão de Limpeza", descricao: "Mutirão para limpeza das áreas comuns", status: "aprovado" },
+const mockEventos: Evento[] = [];
   { id: "3", data: "2024-05-10", titulo: "Reunião de Moradores", descricao: "Reunião mensal para discussão de pautas do condomínio", status: "aprovado" },
   { id: "4", data: "2024-03-25", titulo: "Bazar Solidário", descricao: null, status: "rejeitado" },
   { id: "5", data: "2024-06-01", titulo: "Dia das Crianças Antecipado", descricao: "Evento com brinquedos infláveis e brincadeiras", status: "pendente" },

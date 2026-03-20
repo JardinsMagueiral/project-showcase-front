@@ -21,12 +21,7 @@ interface Grupo {
   ativo: boolean;
 }
 
-const mockGrupos: Grupo[] = [
-  { id: "1", titulo: "Geral 🔊", descricao: "Grupo principal da comunidade", link: "https://chat.whatsapp.com/abc123", ordem: 1, ativo: true },
-  { id: "2", titulo: "Vendas e Trocas 🛒", descricao: "Compra, venda e troca entre moradores", link: "https://chat.whatsapp.com/def456", ordem: 2, ativo: true },
-  { id: "3", titulo: "Pets 🐾", descricao: "Grupo para amantes de pets", link: "https://chat.whatsapp.com/ghi789", ordem: 3, ativo: true },
-  { id: "4", titulo: "Segurança 🔒", descricao: "Alertas de segurança do condomínio", link: "https://chat.whatsapp.com/jkl012", ordem: 4, ativo: false },
-];
+const mockGrupos: Grupo[] = [];
 
 export default function AdminGrupos() {
   const { toast } = useToast();
