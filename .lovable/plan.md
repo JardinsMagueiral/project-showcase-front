@@ -1,43 +1,65 @@
 
 
-## Plano: Copiar todos os paineis Admin do Jardins Mangueiral Connect
+## Diagnostico: Conexao Supabase
 
-### Resumo
+### Situacao atual
 
-Criar 11 paginas de administracao identicas ao projeto original, usando dados mock em vez de Supabase. Inclui tambem o componente `ImovelForm` usado nas paginas de cadastro/edicao de imoveis.
+O Supabase esta conectado corretamente (client configurado em `src/integrations/supabase/client.ts`), porem **nenhuma pagina esta consumindo dados do banco**. Todas as 15 paginas/componentes ainda usam arrays mock vazios em vez de queries ao Supabase.
 
-### Paginas a criar
+### Arquivos que precisam ser conectados
 
-| Arquivo | Descricao |
-|---------|-----------|
-| `src/pages/admin/AdminDashboard.tsx` | Painel principal com stats e links rapidos (9 cards) |
-| `src/pages/admin/AdminImoveis.tsx` | Lista de imoveis com filtro por status, aprovar/rejeitar/destacar/excluir |
-| `src/pages/admin/AdminNovoImovel.tsx` | Formulario de cadastro de imovel (usa ImovelForm) |
-| `src/pages/admin/AdminEditarImovel.tsx` | Formulario de edicao de imovel (usa ImovelForm) |
-| `src/pages/admin/AdminEventos.tsx` | Gerenciar eventos com tabs (pendente/aprovado/rejeitado/todos) |
-| `src/pages/admin/AdminParceiros.tsx` | Gerenciar parceiros com tabs e carousel de fotos |
-| `src/pages/admin/AdminClassificados.tsx` | Tabela de classificados com acoes |
-| `src/pages/admin/AdminClientes.tsx` | Tabela de clientes cadastrados |
-| `src/pages/admin/AdminNoticias.tsx` | Gerenciar noticias com aprovar/rejeitar |
-| `src/pages/admin/AdminGrupos.tsx` | CRUD de grupos WhatsApp com dialog |
-| `src/pages/admin/AdminQuadras.tsx` | Gerenciar quadras com fotos e edicao |
+| Arquivo | Tabela Supabase | Tipo |
+|---------|----------------|------|
+| `src/pages/Imoveis.tsx` | `imoveis` + `imovel_fotos` | Publico |
+| `src/pages/ImovelDetalhe.tsx` | `imoveis` + `imovel_fotos` | Publico |
+| `src/pages/Classificados.tsx` | `classificados` + `classificado_fotos` | Publico |
+| `src/pages/ClassificadoDetalhe.tsx` | `classificados` + `classificado_fotos` | Publico |
+| `src/pages/Parceiros.tsx` | `parceiros` + `parceiro_fotos` | Publico |
+| `src/pages/Noticias.tsx` | `noticias` | Publico |
+| `src/pages/Eventos.tsx` / `EventsCalendar.tsx` | `eventos` | Publico |
+| `src/pages/Grupos.tsx` / `WhatsAppGroups.tsx` | `whatsapp_grupos` | Publico |
+| `src/pages/QuadraDetalhe.tsx` | `quadras` + `quadra_fotos` | Publico |
+| `src/components/FeaturedProperties.tsx` | `imoveis` (destaque=true) | Publico |
+| `src/pages/admin/AdminDashboard.tsx` | Contagens de todas tabelas | Admin |
+| `src/pages/admin/AdminImoveis.tsx` | `imoveis` + `profiles` | Admin |
+| `src/pages/admin/AdminEventos.tsx` | `eventos` | Admin |
+| `src/pages/admin/AdminParceiros.tsx` | `parceiros` + `parceiro_fotos` | Admin |
+| `src/pages/admin/AdminClassificados.tsx` | `classificados` | Admin |
+| `src/pages/admin/AdminClientes.tsx` | `profiles` | Admin |
+| `src/pages/admin/AdminNoticias.tsx` | `noticias` | Admin |
+| `src/pages/admin/AdminGrupos.tsx` | `whatsapp_grupos` | Admin |
+| `src/pages/admin/AdminQuadras.tsx` | `quadras` + `quadra_fotos` | Admin |
+| `src/components/imoveis/ImovelForm.tsx` | `imoveis` + `imovel_fotos` + storage | Admin |
 
-### Componente compartilhado
+### O que precisa ser feito
 
-| Arquivo | Descricao |
-|---------|-----------|
-| `src/components/imoveis/ImovelForm.tsx` | Formulario completo de imovel com upload de fotos, validacao zod, drag-and-drop |
+1. **Paginas publicas (10 arquivos)** -- Substituir arrays mock por queries `supabase.from('tabela').select()` usando `useQuery` do React Query. Dados publicos (status = 'aprovado') nao precisam de autenticacao.
 
-### Alteracoes em arquivos existentes
+2. **Paginas admin (9 arquivos)** -- Substituir arrays mock por queries ao Supabase. As operacoes de CRUD (aprovar, rejeitar, excluir, destacar) precisam de mutacoes reais. Estas paginas so funcionarao com usuario autenticado com role 'admin' devido ao RLS.
 
-- **`src/App.tsx`** -- Adicionar 11 rotas `/admin/*`
-- **`package.json`** -- Adicionar dependencias: `react-helmet-async`, `zod`, `react-hook-form`, `@hookform/resolvers`, `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `date-fns`
+3. **Autenticacao** -- Ainda nao existe login/cadastro no projeto. As paginas admin dependem de autenticacao + role 'admin' para funcionar (RLS exige `has_role(auth.uid(), 'admin')`). Sera necessario criar:
+   - Pagina de login
+   - Hook `useAuth` 
+   - Protecao de rotas admin
 
-### Abordagem tecnica
+4. **Upload de arquivos** -- O `ImovelForm` e as paginas de parceiros/quadras precisam de upload para os storage buckets (`imoveis`, `parceiros`, `classificados`, `quadras`, `noticias`) que ja existem.
 
-- Todas as chamadas ao Supabase serao substituidas por **dados mock estaticos** e funcoes locais com `useState`
-- Acoes como aprovar/rejeitar/excluir atualizarao apenas o state local
-- O `useAuth` sera substituido por dados mock inline (nome do admin, etc.)
-- A estrutura visual (layout, classes CSS, icons, textos) sera **identica** ao original
-- Nenhuma conexao com backend -- apenas frontend
+### Ordem recomendada de implementacao
+
+**Etapa 1 -- Paginas publicas** (nao precisa de auth)
+- Conectar as 10 paginas/componentes publicos ao Supabase
+- Dados com `status = 'aprovado'` sao acessiveis sem login pelo RLS
+
+**Etapa 2 -- Autenticacao**
+- Criar pagina de login/cadastro
+- Criar hook `useAuth` com verificacao de role
+- Proteger rotas `/admin/*`
+
+**Etapa 3 -- Paginas admin**
+- Conectar as 9 paginas admin com queries e mutacoes reais
+- Integrar upload de fotos nos storage buckets
+
+### Nota importante
+
+Nao ha necessidade de migracoes SQL -- todas as tabelas, RLS policies, functions (`has_role`, `handle_new_user`), e storage buckets ja estao configurados corretamente no Supabase.
 
