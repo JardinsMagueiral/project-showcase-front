@@ -1,41 +1,24 @@
 
 
-## Plano: Corrigir Login e Cadastro igual ao projeto original
+## Problema
 
-### Problemas identificados
+A seção "Imóveis em Destaque" na página inicial não mostra nenhum imóvel porque o componente `FeaturedProperties` filtra por `destaque=true`, mas todos os 21 imóveis no banco têm `destaque=false`.
 
-1. **Botao "Entrar" no Header** aponta para `/contato` em vez de `/login` (linhas 146 e 198 do Header)
-2. **Pagina de Login atual** usa tabs (login + cadastro juntos) -- o original tem paginas separadas
-3. **Cadastro** falta CPF e confirmacao de senha
+## Solução
 
-### Solucao
+Alterar o `FeaturedProperties.tsx` para mostrar os imóveis aprovados mais recentes quando não houver nenhum marcado como destaque. Ou seja, remover o filtro `.eq("destaque", true)` e mostrar simplesmente os 6 imóveis aprovados mais recentes, renomeando a seção para algo mais genérico como "Imóveis Disponíveis".
 
-Replicar exatamente o projeto original que tem duas paginas separadas:
+Alternativamente, manter a lógica de destaque mas fazer fallback: primeiro busca destaques, se não houver, busca os mais recentes.
 
-**1. Atualizar `src/components/Header.tsx`**
-- Trocar `to="/contato"` por `to="/login"` nos dois botoes "Entrar" (desktop e mobile)
-- Adicionar icone `LogIn` no import
+### Arquivo: `src/components/FeaturedProperties.tsx`
 
-**2. Reescrever `src/pages/Login.tsx`**
-- Pagina separada apenas para login (sem tabs)
-- Campos: email + senha com toggle de visibilidade
-- Validacao com zod + react-hook-form
-- Links para "Esqueceu sua senha?" e "Cadastre-se"
-- Identico ao `src/pages/auth/Login.tsx` do original
-
-**3. Criar `src/pages/Cadastro.tsx`**
-- Pagina separada de cadastro
-- Campos: Nome, Email, Telefone, CPF (opcional), Senha, Confirmar Senha
-- Toggle de visibilidade nas senhas
-- Validacao zod com `.refine()` para confirmar senha
-- Identico ao `src/pages/auth/Cadastro.tsx` do original
-
-**4. Atualizar `src/App.tsx`**
-- Adicionar rota `/cadastro` com o novo componente
+- Remover `.eq("destaque", true)` da query
+- Manter `.eq("status", "aprovado")` e `.order("created_at", { ascending: false }).limit(6)`
+- Atualizar o título para "Imóveis Disponíveis" ou manter "Imóveis em Destaque" com fallback
 
 ### Detalhes tecnicos
 
-- Ambas as paginas usam `supabase.auth` diretamente (sem depender do `useAuth` hook para signIn/signUp)
-- O `signUp` envia `nome`, `telefone` e `cpf` no `options.data` -- o trigger `handle_new_user` ja existente trata esses dados
-- O CPF ja existe na tabela `profiles` como coluna opcional
+- Apenas uma linha removida na query Supabase
+- O `queryKey` deve ser atualizado para refletir a mudança
+- Nenhuma migração de banco necessária
 
