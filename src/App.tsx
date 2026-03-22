@@ -19,6 +19,7 @@ import Classificados from "./pages/Classificados";
 import ClassificadoDetalhe from "./pages/ClassificadoDetalhe";
 import QuadraDetalhe from "./pages/QuadraDetalhe";
 import Login from "./pages/Login";
+import Cadastro from "./pages/Cadastro";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminImoveis from "./pages/admin/AdminImoveis";
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/classificados" element={<Classificados />} />
             <Route path="/classificados/:id" element={<ClassificadoDetalhe />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/imoveis" element={<ProtectedRoute requireAdmin><AdminImoveis /></ProtectedRoute>} />
             <Route path="/admin/novo-imovel" element={<ProtectedRoute requireAdmin><AdminNovoImovel /></ProtectedRoute>} />

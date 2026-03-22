@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight } from "lucide-react";
+import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -143,7 +143,10 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-            <Link to="/contato">Entrar</Link>
+            <Link to="/login">
+              <LogIn className="mr-2 h-4 w-4" />
+              Entrar
+            </Link>
           </Button>
           <Button variant="whatsapp" size="sm" className="hidden sm:flex" asChild>
             <a href="https://wa.me/5561991647984" target="_blank" rel="noopener noreferrer">
@@ -193,7 +196,8 @@ export function Header() {
                       {item.label}
                     </Link>)}
                   <Button variant="outline" className="mt-4" asChild>
-                    <Link to="/contato" onClick={() => setIsOpen(false)}>
+                    <Link to="/login" onClick={() => setIsOpen(false)}>
+                      <LogIn className="mr-2 h-4 w-4" />
                       Entrar
                     </Link>
                   </Button>
