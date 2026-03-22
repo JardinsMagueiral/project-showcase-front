@@ -7,32 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Upload, X, Image, ArrowLeft, GripVertical, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import {
-  DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable,
-} from "@dnd-kit/sortable";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-interface Quadra {
-  id: string;
-  numero: number;
-  nome: string;
-  telefone: string;
-  email: string;
-  taxa_condominio: number;
-}
+interface QuadraFoto { id: string; url: string; ordem: number; }
 
-interface QuadraFoto {
-  id: string;
-  url: string;
-  ordem: number;
-}
-
-function SortableQuadraPhoto({ foto, onDelete }: { foto: QuadraFoto; onDelete: (foto: QuadraFoto) => void; isDeleting: boolean }) {
+function SortableQuadraPhoto({ foto, onDelete }: { foto: QuadraFoto; onDelete: (foto: QuadraFoto) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: foto.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1, zIndex: isDragging ? 10 : 1 };
   return (
@@ -48,15 +34,11 @@ function SortableQuadraPhoto({ foto, onDelete }: { foto: QuadraFoto; onDelete: (
   );
 }
 
-const mockQuadras: Quadra[] = [];
-
-const mockFotos: Record<string, QuadraFoto[]> = {};
-
 export default function AdminQuadras() {
-  const [quadras, setQuadras] = useState<Quadra[]>(mockQuadras);
-  const [selectedQuadra, setSelectedQuadra] = useState<Quadra | null>(null);
+  const queryClient = useQueryClient();
+  const [selectedQuadra, setSelectedQuadra] = useState<any>(null);
   const [fotos, setFotos] = useState<QuadraFoto[]>([]);
-  const [editingQuadra, setEditingQuadra] = useState<Quadra | null>(null);
+  const [editingQuadra, setEditingQuadra] = useState<any>(null);
   const [editForm, setEditForm] = useState({ nome: "", numero: "", telefone: "", email: "", taxa_condominio: "" });
 
   const sensors = useSensors(
@@ -64,40 +46,72 @@ export default function AdminQuadras() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const openDialog = (quadra: Quadra) => {
+  const { data: quadras = [], isLoading } = useQuery({
+    queryKey: ["admin-quadras"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("quadras").select("*").order("numero", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const openDialog = async (quadra: any) => {
     setSelectedQuadra(quadra);
-    setFotos(mockFotos[quadra.id] || []);
+    const { data } = await supabase.from("quadra_fotos").select("*").eq("quadra_id", quadra.id).order("ordem", { ascending: true });
+    setFotos(data || []);
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !selectedQuadra) return;
     const files = Array.from(e.target.files);
     if (fotos.length + files.length > 10) { toast.error("Máximo de 10 fotos."); return; }
-    const newFotos = files.map((file, i) => ({
-      id: `new-${Date.now()}-${i}`,
-      url: URL.createObjectURL(file),
-      ordem: fotos.length + i,
-    }));
-    setFotos([...fotos, ...newFotos]);
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ext = file.name.split(".").pop();
+      const path = `${selectedQuadra.id}/${Date.now()}-${i}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("quadras").upload(path, file);
+      if (uploadError) { toast.error("Erro ao enviar foto"); continue; }
+      const { data: { publicUrl } } = supabase.storage.from("quadras").getPublicUrl(path);
+      const { data: inserted } = await supabase.from("quadra_fotos").insert({ quadra_id: selectedQuadra.id, url: publicUrl, ordem: fotos.length + i }).select().single();
+      if (inserted) setFotos(prev => [...prev, inserted]);
+    }
     toast.success("Fotos adicionadas!");
     e.target.value = "";
   };
 
-  const handleDeleteFoto = (foto: QuadraFoto) => {
+  const handleDeleteFoto = async (foto: QuadraFoto) => {
+    await supabase.from("quadra_fotos").delete().eq("id", foto.id);
     setFotos(fotos.filter(f => f.id !== foto.id));
     toast.success("Foto removida!");
   };
 
-  const openEditDialog = (quadra: Quadra) => {
+  const openEditDialog = (quadra: any) => {
     setEditingQuadra(quadra);
     setEditForm({ nome: quadra.nome, numero: String(quadra.numero), telefone: quadra.telefone, email: quadra.email, taxa_condominio: String(quadra.taxa_condominio) });
   };
 
+  const updateQuadraMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      const { error } = await supabase.from("quadras").update(payload).eq("id", editingQuadra.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-quadras"] });
+      toast.success("Quadra atualizada!");
+      setEditingQuadra(null);
+    },
+  });
+
   const handleSaveEdit = () => {
     if (!editingQuadra) return;
-    setQuadras(quadras.map(q => q.id === editingQuadra.id ? { ...q, nome: editForm.nome.trim(), numero: Number(editForm.numero), telefone: editForm.telefone.trim(), email: editForm.email.trim(), taxa_condominio: Number(editForm.taxa_condominio) } : q));
-    toast.success("Quadra atualizada!");
-    setEditingQuadra(null);
+    updateQuadraMutation.mutate({
+      nome: editForm.nome.trim(),
+      numero: Number(editForm.numero),
+      telefone: editForm.telefone.trim(),
+      email: editForm.email.trim(),
+      taxa_condominio: Number(editForm.taxa_condominio),
+    });
   };
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -105,8 +119,16 @@ export default function AdminQuadras() {
     if (!over || active.id === over.id) return;
     const oldIndex = fotos.findIndex(f => f.id === active.id);
     const newIndex = fotos.findIndex(f => f.id === over.id);
-    setFotos(arrayMove(fotos, oldIndex, newIndex));
+    const reordered = arrayMove(fotos, oldIndex, newIndex);
+    setFotos(reordered);
+    reordered.forEach((f, i) => {
+      supabase.from("quadra_fotos").update({ ordem: i }).eq("id", f.id);
+    });
   }, [fotos]);
+
+  if (isLoading) {
+    return <div className="flex min-h-screen flex-col bg-background"><Header /><main className="flex-1 py-8"><div className="container px-4"><Skeleton className="h-96" /></div></main><Footer /></div>;
+  }
 
   return (
     <>
@@ -114,9 +136,7 @@ export default function AdminQuadras() {
         <Header />
         <main className="flex-1 py-8">
           <div className="container px-4">
-            <Button variant="ghost" size="sm" className="mb-4" asChild>
-              <Link to="/admin"><ArrowLeft className="mr-2 h-4 w-4" />Voltar ao Painel</Link>
-            </Button>
+            <Button variant="ghost" size="sm" className="mb-4" asChild><Link to="/admin"><ArrowLeft className="mr-2 h-4 w-4" />Voltar ao Painel</Link></Button>
             <h1 className="font-serif text-3xl font-bold mb-6">Gerenciar Quadras</h1>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {quadras.map(q => (
@@ -126,12 +146,8 @@ export default function AdminQuadras() {
                     <p className="text-sm text-muted-foreground">{q.nome}</p>
                     <p className="text-xs text-muted-foreground mt-1">Taxa: R$ {Number(q.taxa_condominio).toFixed(2)}</p>
                     <div className="mt-3 flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1" onClick={e => { e.stopPropagation(); openEditDialog(q); }}>
-                        <Pencil className="mr-1 h-3 w-3" />Editar
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1" onClick={() => openDialog(q)}>
-                        <Image className="mr-1 h-3 w-3" />Fotos
-                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1" onClick={e => { e.stopPropagation(); openEditDialog(q); }}><Pencil className="mr-1 h-3 w-3" />Editar</Button>
+                      <Button variant="outline" size="sm" className="flex-1" onClick={() => openDialog(q)}><Image className="mr-1 h-3 w-3" />Fotos</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -151,7 +167,7 @@ export default function AdminQuadras() {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={fotos.map(f => f.id)} strategy={rectSortingStrategy}>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {fotos.map(foto => <SortableQuadraPhoto key={foto.id} foto={foto} onDelete={handleDeleteFoto} isDeleting={false} />)}
+                {fotos.map(foto => <SortableQuadraPhoto key={foto.id} foto={foto} onDelete={handleDeleteFoto} />)}
               </div>
             </SortableContext>
           </DndContext>
@@ -159,9 +175,7 @@ export default function AdminQuadras() {
             <div className="mt-4">
               <label className="cursor-pointer">
                 <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleUpload} className="hidden" />
-                <Button variant="outline" className="w-full" asChild>
-                  <span><Upload className="mr-2 h-4 w-4" />Adicionar Fotos ({fotos.length}/10)</span>
-                </Button>
+                <Button variant="outline" className="w-full" asChild><span><Upload className="mr-2 h-4 w-4" />Adicionar Fotos ({fotos.length}/10)</span></Button>
               </label>
             </div>
           )}
@@ -180,7 +194,7 @@ export default function AdminQuadras() {
             <div><Label htmlFor="edit-telefone">Telefone</Label><Input id="edit-telefone" value={editForm.telefone} onChange={e => setEditForm(f => ({ ...f, telefone: e.target.value }))} /></div>
             <div><Label htmlFor="edit-email">Email</Label><Input id="edit-email" type="email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} /></div>
             <div><Label htmlFor="edit-taxa">Taxa de Condomínio (R$)</Label><Input id="edit-taxa" type="number" step="0.01" value={editForm.taxa_condominio} onChange={e => setEditForm(f => ({ ...f, taxa_condominio: e.target.value }))} /></div>
-            <Button onClick={handleSaveEdit} className="w-full">Salvar Alterações</Button>
+            <Button onClick={handleSaveEdit} className="w-full" disabled={updateQuadraMutation.isPending}>Salvar Alterações</Button>
           </div>
         </DialogContent>
       </Dialog>
