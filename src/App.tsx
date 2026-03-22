@@ -19,6 +19,7 @@ import Classificados from "./pages/Classificados";
 import ClassificadoDetalhe from "./pages/ClassificadoDetalhe";
 import QuadraDetalhe from "./pages/QuadraDetalhe";
 import Login from "./pages/Login";
+import Cadastro from "./pages/Cadastro";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminImoveis from "./pages/admin/AdminImoveis";
