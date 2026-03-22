@@ -1,13 +1,15 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Bed, Bath, Car, Maximize, ArrowRight, Building } from "lucide-react";
+import { Bed, Bath, Car, Maximize, ArrowRight, Building, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export function FeaturedProperties() {
+  const [showAll, setShowAll] = useState(false);
   const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(price);
 
   const { data: imoveis = [], isLoading } = useQuery({
@@ -17,8 +19,7 @@ export function FeaturedProperties() {
         .from("imoveis")
         .select("*, imovel_fotos(url, ordem)")
         .eq("status", "aprovado")
-        .order("created_at", { ascending: false })
-        .limit(6);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -28,8 +29,8 @@ export function FeaturedProperties() {
     return (
       <section className="bg-muted/50 py-16">
         <div className="container px-4">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1,2,3].map(i => <Skeleton key={i} className="h-72 rounded-lg" />)}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-72 rounded-lg" />)}
           </div>
         </div>
       </section>
@@ -37,6 +38,9 @@ export function FeaturedProperties() {
   }
 
   if (imoveis.length === 0) return null;
+
+  const visibleImoveis = showAll ? imoveis : imoveis.slice(0, 16);
+  const hasMore = imoveis.length > 16;
 
   return (
     <section className="bg-muted/50 py-16">
@@ -50,8 +54,8 @@ export function FeaturedProperties() {
             <Link to="/imoveis">Ver Todos <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {imoveis.map((imovel) => {
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {visibleImoveis.map((imovel) => {
             const foto = imovel.imovel_fotos?.sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))[0];
             return (
               <Link key={imovel.id} to={`/imoveis/${imovel.id}`}>
@@ -81,6 +85,13 @@ export function FeaturedProperties() {
             );
           })}
         </div>
+        {hasMore && !showAll && (
+          <div className="mt-8 text-center">
+            <Button variant="outline" size="lg" onClick={() => setShowAll(true)}>
+              Mostrar Mais <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        )}
         <div className="mt-6 text-center md:hidden">
           <Button variant="outline" asChild><Link to="/imoveis">Ver Todos os Imóveis <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
         </div>
