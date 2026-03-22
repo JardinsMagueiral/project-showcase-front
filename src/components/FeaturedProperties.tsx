@@ -43,8 +43,8 @@ export function FeaturedProperties() {
       <div className="container px-4">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="font-serif text-3xl font-bold text-foreground">Imóveis em Destaque</h2>
-            <p className="mt-2 text-muted-foreground">Confira as melhores oportunidades do Jardins Mangueiral</p>
+            <h2 className="font-serif text-3xl font-bold text-foreground">Imóveis Disponíveis</h2>
+            <p className="mt-2 text-muted-foreground">Confira as oportunidades mais recentes do Jardins Mangueiral</p>
           </div>
           <Button variant="outline" asChild className="hidden md:flex">
             <Link to="/imoveis">Ver Todos <ArrowRight className="ml-2 h-4 w-4" /></Link>
