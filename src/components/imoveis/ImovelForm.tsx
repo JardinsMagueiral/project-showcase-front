@@ -201,9 +201,25 @@ export function ImovelForm({ isAdmin = false, initialData, existingPhotos: initi
 
     try {
       const imovelPayload = {
-        ...data,
+        tipo: data.tipo,
+        operacao: data.operacao,
+        endereco: data.endereco,
+        numero: data.numero || null,
+        complemento: data.complemento || null,
+        bairro: data.bairro,
+        cep: data.cep || null,
+        quartos: data.quartos,
+        banheiros: data.banheiros,
+        vagas: data.vagas,
+        area_m2: data.area_m2 || null,
+        preco: data.preco,
+        condominio: data.condominio || null,
+        iptu: data.iptu || null,
+        descricao: data.descricao || null,
+        mobiliado: data.mobiliado,
+        aceita_pets: data.aceita_pets,
         user_id: user.id,
-        status: isAdmin ? "aprovado" : "pendente",
+        status: isAdmin ? "aprovado" as const : "pendente" as const,
       };
 
       let imovelId = initialData?.id;
@@ -212,7 +228,7 @@ export function ImovelForm({ isAdmin = false, initialData, existingPhotos: initi
         const { error } = await supabase.from("imoveis").update(imovelPayload).eq("id", imovelId);
         if (error) throw error;
       } else {
-        const { data: inserted, error } = await supabase.from("imoveis").insert(imovelPayload).select().single();
+        const { data: inserted, error } = await supabase.from("imoveis").insert([imovelPayload]).select().single();
         if (error) throw error;
         imovelId = inserted.id;
       }
