@@ -11,13 +11,12 @@ export function FeaturedProperties() {
   const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(price);
 
   const { data: imoveis = [], isLoading } = useQuery({
-    queryKey: ["imoveis-destaque"],
+    queryKey: ["imoveis-recentes"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("imoveis")
         .select("*, imovel_fotos(url, ordem)")
         .eq("status", "aprovado")
-        .eq("destaque", true)
         .order("created_at", { ascending: false })
         .limit(6);
       if (error) throw error;
