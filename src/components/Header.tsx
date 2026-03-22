@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight } from "lucide-react";
+import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
