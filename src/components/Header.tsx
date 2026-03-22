@@ -196,7 +196,8 @@ export function Header() {
                       {item.label}
                     </Link>)}
                   <Button variant="outline" className="mt-4" asChild>
-                    <Link to="/contato" onClick={() => setIsOpen(false)}>
+                    <Link to="/login" onClick={() => setIsOpen(false)}>
+                      <LogIn className="mr-2 h-4 w-4" />
                       Entrar
                     </Link>
                   </Button>

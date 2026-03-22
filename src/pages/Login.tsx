@@ -6,24 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, LogIn, UserPlus } from "lucide-react";
+import { Loader2, LogIn, Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [registerForm, setRegisterForm] = useState({ nome: "", email: "", telefone: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast({ title: "Preencha todos os campos", variant: "destructive" });
+      return;
+    }
     setLoading(true);
-    const { error } = await signIn(loginForm.email, loginForm.password);
+    const { error } = await signIn(email, password);
     if (error) {
       toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
     } else {
@@ -33,75 +36,59 @@ export default function Login() {
     setLoading(false);
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await signUp(registerForm.email, registerForm.password, registerForm.nome, registerForm.telefone);
-    if (error) {
-      toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Conta criada!", description: "Verifique seu e-mail para confirmar o cadastro." });
-    }
-    setLoading(false);
-  };
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
       <main className="flex flex-1 items-center justify-center py-12">
         <Card className="w-full max-w-md mx-4">
-          <Tabs defaultValue="login">
-            <CardHeader>
-              <CardTitle className="text-center font-serif text-2xl">Acesse sua Conta</CardTitle>
-              <CardDescription className="text-center">Entre ou crie sua conta no Jardins Mangueiral Connect</CardDescription>
-              <TabsList className="grid w-full grid-cols-2 mt-4">
-                <TabsTrigger value="login">Entrar</TabsTrigger>
-                <TabsTrigger value="register">Cadastrar</TabsTrigger>
-              </TabsList>
-            </CardHeader>
-            <CardContent>
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">E-mail</Label>
-                    <Input id="login-email" type="email" required value={loginForm.email} onChange={e => setLoginForm({ ...loginForm, email: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Senha</Label>
-                    <Input id="login-password" type="password" required value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
-                    Entrar
-                  </Button>
-                </form>
-              </TabsContent>
-              <TabsContent value="register">
-                <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-nome">Nome</Label>
-                    <Input id="reg-nome" required value={registerForm.nome} onChange={e => setRegisterForm({ ...registerForm, nome: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-email">E-mail</Label>
-                    <Input id="reg-email" type="email" required value={registerForm.email} onChange={e => setRegisterForm({ ...registerForm, email: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-telefone">Telefone</Label>
-                    <Input id="reg-telefone" required value={registerForm.telefone} onChange={e => setRegisterForm({ ...registerForm, telefone: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-password">Senha</Label>
-                    <Input id="reg-password" type="password" required minLength={6} value={registerForm.password} onChange={e => setRegisterForm({ ...registerForm, password: e.target.value })} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-                    Criar Conta
-                  </Button>
-                </form>
-              </TabsContent>
-            </CardContent>
-          </Tabs>
+          <CardHeader className="text-center">
+            <CardTitle className="font-serif text-2xl">Entrar</CardTitle>
+            <CardDescription>Acesse sua conta no Jardins Mangueiral Connect</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+                Entrar
+              </Button>
+              <p className="text-center text-sm text-muted-foreground">
+                Não tem uma conta?{" "}
+                <Link to="/cadastro" className="font-medium text-primary hover:underline">
+                  Cadastre-se
+                </Link>
+              </p>
+            </form>
+          </CardContent>
         </Card>
       </main>
       <Footer />
