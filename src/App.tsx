@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import QuemSomos from "./pages/QuemSomos";
 import Imoveis from "./pages/Imoveis";
@@ -16,6 +18,7 @@ import Contato from "./pages/Contato";
 import Classificados from "./pages/Classificados";
 import ClassificadoDetalhe from "./pages/ClassificadoDetalhe";
 import QuadraDetalhe from "./pages/QuadraDetalhe";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminImoveis from "./pages/admin/AdminImoveis";
@@ -33,39 +36,42 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/quadra/:numero" element={<QuadraDetalhe />} />
-          <Route path="/quem-somos" element={<QuemSomos />} />
-          <Route path="/imoveis" element={<Imoveis />} />
-          <Route path="/imoveis/:id" element={<ImovelDetalhe />} />
-          <Route path="/noticias" element={<Noticias />} />
-          <Route path="/parceiros" element={<Parceiros />} />
-          <Route path="/grupos" element={<Grupos />} />
-          <Route path="/eventos" element={<Eventos />} />
-          <Route path="/calculadoras" element={<Calculadoras />} />
-          <Route path="/contato" element={<Contato />} />
-          <Route path="/classificados" element={<Classificados />} />
-          <Route path="/classificados/:id" element={<ClassificadoDetalhe />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/imoveis" element={<AdminImoveis />} />
-          <Route path="/admin/novo-imovel" element={<AdminNovoImovel />} />
-          <Route path="/admin/imoveis/:id/editar" element={<AdminEditarImovel />} />
-          <Route path="/admin/eventos" element={<AdminEventos />} />
-          <Route path="/admin/parceiros" element={<AdminParceiros />} />
-          <Route path="/admin/classificados" element={<AdminClassificados />} />
-          <Route path="/admin/clientes" element={<AdminClientes />} />
-          <Route path="/admin/noticias" element={<AdminNoticias />} />
-          <Route path="/admin/grupos" element={<AdminGrupos />} />
-          <Route path="/admin/quadras" element={<AdminQuadras />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/quadra/:numero" element={<QuadraDetalhe />} />
+            <Route path="/quem-somos" element={<QuemSomos />} />
+            <Route path="/imoveis" element={<Imoveis />} />
+            <Route path="/imoveis/:id" element={<ImovelDetalhe />} />
+            <Route path="/noticias" element={<Noticias />} />
+            <Route path="/parceiros" element={<Parceiros />} />
+            <Route path="/grupos" element={<Grupos />} />
+            <Route path="/eventos" element={<Eventos />} />
+            <Route path="/calculadoras" element={<Calculadoras />} />
+            <Route path="/contato" element={<Contato />} />
+            <Route path="/classificados" element={<Classificados />} />
+            <Route path="/classificados/:id" element={<ClassificadoDetalhe />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/imoveis" element={<ProtectedRoute requireAdmin><AdminImoveis /></ProtectedRoute>} />
+            <Route path="/admin/novo-imovel" element={<ProtectedRoute requireAdmin><AdminNovoImovel /></ProtectedRoute>} />
+            <Route path="/admin/imoveis/:id/editar" element={<ProtectedRoute requireAdmin><AdminEditarImovel /></ProtectedRoute>} />
+            <Route path="/admin/eventos" element={<ProtectedRoute requireAdmin><AdminEventos /></ProtectedRoute>} />
+            <Route path="/admin/parceiros" element={<ProtectedRoute requireAdmin><AdminParceiros /></ProtectedRoute>} />
+            <Route path="/admin/classificados" element={<ProtectedRoute requireAdmin><AdminClassificados /></ProtectedRoute>} />
+            <Route path="/admin/clientes" element={<ProtectedRoute requireAdmin><AdminClientes /></ProtectedRoute>} />
+            <Route path="/admin/noticias" element={<ProtectedRoute requireAdmin><AdminNoticias /></ProtectedRoute>} />
+            <Route path="/admin/grupos" element={<ProtectedRoute requireAdmin><AdminGrupos /></ProtectedRoute>} />
+            <Route path="/admin/quadras" element={<ProtectedRoute requireAdmin><AdminQuadras /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
