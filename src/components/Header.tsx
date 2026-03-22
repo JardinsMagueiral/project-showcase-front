@@ -143,7 +143,10 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-            <Link to="/contato">Entrar</Link>
+            <Link to="/login">
+              <LogIn className="mr-2 h-4 w-4" />
+              Entrar
+            </Link>
           </Button>
           <Button variant="whatsapp" size="sm" className="hidden sm:flex" asChild>
             <a href="https://wa.me/5561991647984" target="_blank" rel="noopener noreferrer">
