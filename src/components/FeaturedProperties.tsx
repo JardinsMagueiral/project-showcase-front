@@ -11,13 +11,12 @@ export function FeaturedProperties() {
   const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(price);
 
   const { data: imoveis = [], isLoading } = useQuery({
-    queryKey: ["imoveis-destaque"],
+    queryKey: ["imoveis-recentes"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("imoveis")
         .select("*, imovel_fotos(url, ordem)")
         .eq("status", "aprovado")
-        .eq("destaque", true)
         .order("created_at", { ascending: false })
         .limit(6);
       if (error) throw error;
@@ -44,8 +43,8 @@ export function FeaturedProperties() {
       <div className="container px-4">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="font-serif text-3xl font-bold text-foreground">Imóveis em Destaque</h2>
-            <p className="mt-2 text-muted-foreground">Confira as melhores oportunidades do Jardins Mangueiral</p>
+            <h2 className="font-serif text-3xl font-bold text-foreground">Imóveis Disponíveis</h2>
+            <p className="mt-2 text-muted-foreground">Confira as oportunidades mais recentes do Jardins Mangueiral</p>
           </div>
           <Button variant="outline" asChild className="hidden md:flex">
             <Link to="/imoveis">Ver Todos <ArrowRight className="ml-2 h-4 w-4" /></Link>
