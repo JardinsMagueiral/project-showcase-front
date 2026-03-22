@@ -2,11 +2,25 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Handshake, Wrench, Building2, UserPlus, MessageCircle, Phone } from "lucide-react";
-
-const mockParceiros: { id: string; nome: string; categoria: string; descricao: string; telefone: string }[] = [];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Parceiros = () => {
+  const { data: parceiros = [], isLoading } = useQuery({
+    queryKey: ["parceiros-publicos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("parceiros")
+        .select("*")
+        .eq("status", "aprovado")
+        .order("destaque", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
@@ -21,23 +35,29 @@ const Parceiros = () => {
         <section className="py-16">
           <div className="container px-4">
             <h2 className="mb-8 text-center font-serif text-3xl font-bold">Parceiros da Comunidade</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {mockParceiros.map((p) => (
-                <Card key={p.id} className="transition-all hover:shadow-lg">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">{p.nome}</CardTitle>
-                    <CardDescription>{p.descricao}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button variant="whatsapp" size="sm" asChild>
-                      <a href={`https://wa.me/55${p.telefone}`} target="_blank" rel="noopener noreferrer">
-                        <Phone className="mr-1 h-4 w-4" /> WhatsApp
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {[1,2,3].map(i => <Skeleton key={i} className="h-48 rounded-lg" />)}
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {parceiros.map((p) => (
+                  <Card key={p.id} className="transition-all hover:shadow-lg">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xl">{p.nome}</CardTitle>
+                      <CardDescription>{p.descricao}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button variant="whatsapp" size="sm" asChild>
+                        <a href={`https://wa.me/55${p.telefone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
+                          <Phone className="mr-1 h-4 w-4" /> WhatsApp
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </section>
         <section className="py-16 bg-muted/50">
