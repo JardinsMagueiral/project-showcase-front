@@ -1,15 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Bed, Bath, Car, Maximize, ArrowRight, Building, ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bed, Bath, Car, Maximize, ArrowRight, Building, ChevronDown, ChevronUp, X, SlidersHorizontal } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export function FeaturedProperties() {
   const [showAll, setShowAll] = useState(false);
+  const [tipo, setTipo] = useState("");
+  const [operacao, setOperacao] = useState("");
+  const [quartos, setQuartos] = useState("");
+  const [banheiros, setBanheiros] = useState("");
+  const [precoMin, setPrecoMin] = useState("");
+  const [precoMax, setPrecoMax] = useState("");
+
   const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(price);
 
   const { data: imoveis = [], isLoading } = useQuery({
@@ -25,6 +34,30 @@ export function FeaturedProperties() {
     },
   });
 
+  const filteredImoveis = useMemo(() => {
+    if (!showAll) return imoveis;
+    return imoveis.filter((imovel) => {
+      if (tipo && imovel.tipo !== tipo) return false;
+      if (operacao && imovel.operacao !== operacao) return false;
+      if (quartos && (imovel.quartos ?? 0) < Number(quartos)) return false;
+      if (banheiros && (imovel.banheiros ?? 0) < Number(banheiros)) return false;
+      if (precoMin && imovel.preco < Number(precoMin)) return false;
+      if (precoMax && imovel.preco > Number(precoMax)) return false;
+      return true;
+    });
+  }, [imoveis, showAll, tipo, operacao, quartos, banheiros, precoMin, precoMax]);
+
+  const hasActiveFilters = tipo || operacao || quartos || banheiros || precoMin || precoMax;
+
+  const clearFilters = () => {
+    setTipo("");
+    setOperacao("");
+    setQuartos("");
+    setBanheiros("");
+    setPrecoMin("");
+    setPrecoMax("");
+  };
+
   if (isLoading) {
     return (
       <section className="bg-muted/50 py-16">
@@ -39,7 +72,7 @@ export function FeaturedProperties() {
 
   if (imoveis.length === 0) return null;
 
-  const visibleImoveis = showAll ? imoveis : imoveis.slice(0, 16);
+  const visibleImoveis = showAll ? filteredImoveis : imoveis.slice(0, 16);
   const hasMore = imoveis.length > 16;
 
   return (
