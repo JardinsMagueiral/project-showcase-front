@@ -1,24 +1,53 @@
 
 
-## Problema
+## Plano: Botao de usuario logado + Esqueci minha senha
 
-A seção "Imóveis em Destaque" na página inicial não mostra nenhum imóvel porque o componente `FeaturedProperties` filtra por `destaque=true`, mas todos os 21 imóveis no banco têm `destaque=false`.
+### 1. Header — Botao "Entrar" vira nome do usuario
 
-## Solução
+**Arquivo:** `src/components/Header.tsx`
 
-Alterar o `FeaturedProperties.tsx` para mostrar os imóveis aprovados mais recentes quando não houver nenhum marcado como destaque. Ou seja, remover o filtro `.eq("destaque", true)` e mostrar simplesmente os 6 imóveis aprovados mais recentes, renomeando a seção para algo mais genérico como "Imóveis Disponíveis".
+- Importar `useAuth` e usar `user`, `signOut`, `loading`
+- Importar icones `User`, `LogOut`
+- Quando logado: substituir o botao "Entrar" por um `DropdownMenu` com:
+  - Nome do usuario (de `user.user_metadata.nome` ou email)
+  - Opcao "Painel Admin" (se admin)
+  - Opcao "Sair" que chama `signOut()`
+- Quando deslogado: manter o botao "Entrar" atual
+- Aplicar a mesma logica no menu mobile (Sheet)
 
-Alternativamente, manter a lógica de destaque mas fazer fallback: primeiro busca destaques, se não houver, busca os mais recentes.
+### 2. Login — Link "Esqueci minha senha"
 
-### Arquivo: `src/components/FeaturedProperties.tsx`
+**Arquivo:** `src/pages/Login.tsx`
 
-- Remover `.eq("destaque", true)` da query
-- Manter `.eq("status", "aprovado")` e `.order("created_at", { ascending: false }).limit(6)`
-- Atualizar o título para "Imóveis Disponíveis" ou manter "Imóveis em Destaque" com fallback
+- Adicionar link "Esqueci minha senha" abaixo do campo de senha, antes do botao Entrar
+- O link leva para `/esqueci-senha`
+
+### 3. Pagina "Esqueci minha senha"
+
+**Novo arquivo:** `src/pages/EsqueciSenha.tsx`
+
+- Formulario com campo de email
+- Ao enviar, chama `supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/redefinir-senha' })`
+- Mostra mensagem de sucesso apos envio
+
+### 4. Pagina "Redefinir senha"
+
+**Novo arquivo:** `src/pages/RedefinirSenha.tsx`
+
+- Detecta token de recovery na URL (hash)
+- Formulario com nova senha + confirmacao
+- Chama `supabase.auth.updateUser({ password })`
+- Redireciona para login apos sucesso
+
+### 5. Rotas
+
+**Arquivo:** `src/App.tsx`
+
+- Adicionar rotas `/esqueci-senha` e `/redefinir-senha`
 
 ### Detalhes tecnicos
 
-- Apenas uma linha removida na query Supabase
-- O `queryKey` deve ser atualizado para refletir a mudança
-- Nenhuma migração de banco necessária
+- Nenhuma migracao de banco necessaria
+- O reset de senha usa o fluxo nativo do Supabase Auth
+- O nome do usuario vem de `user.user_metadata.nome` (salvo no signup)
 
