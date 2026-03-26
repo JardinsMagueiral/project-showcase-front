@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
-import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight, LogIn } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight, LogIn, User, LogOut, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -63,6 +64,15 @@ const menuItems = [{
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [quadrasOpen, setQuadrasOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const userName = user?.user_metadata?.nome || user?.email || "Usuário";
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -142,12 +152,38 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-            <Link to="/login">
-              <LogIn className="mr-2 h-4 w-4" />
-              Entrar
-            </Link>
-          </Button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
+                  <User className="h-4 w-4" />
+                  <span className="max-w-[120px] truncate">{userName}</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="cursor-pointer">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Painel Admin
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
+              <Link to="/login">
+                <LogIn className="mr-2 h-4 w-4" />
+                Entrar
+              </Link>
+            </Button>
+          )}
           <Button variant="whatsapp" size="sm" className="hidden sm:flex" asChild>
             <a href="https://wa.me/5561991647984" target="_blank" rel="noopener noreferrer">
               <MessageCircle className="mr-2 h-4 w-4" />
@@ -195,12 +231,29 @@ export function Header() {
                       <item.icon className="h-5 w-5" />
                       {item.label}
                     </Link>)}
-                  <Button variant="outline" className="mt-4" asChild>
-                    <Link to="/login" onClick={() => setIsOpen(false)}>
-                      <LogIn className="mr-2 h-4 w-4" />
-                      Entrar
-                    </Link>
-                  </Button>
+                  {user ? (
+                    <>
+                      {isAdmin && (
+                        <Button variant="outline" className="mt-4" asChild>
+                          <Link to="/admin" onClick={() => setIsOpen(false)}>
+                            <Shield className="mr-2 h-4 w-4" />
+                            Painel Admin
+                          </Link>
+                        </Button>
+                      )}
+                      <Button variant="outline" className={isAdmin ? "mt-2" : "mt-4"} onClick={() => { handleSignOut(); setIsOpen(false); }}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sair ({userName})
+                      </Button>
+                    </>
+                  ) : (
+                    <Button variant="outline" className="mt-4" asChild>
+                      <Link to="/login" onClick={() => setIsOpen(false)}>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Entrar
+                      </Link>
+                    </Button>
+                  )}
                   <Button variant="whatsapp" className="mt-2" asChild>
                     <a href="https://wa.me/5561991647984" target="_blank" rel="noopener noreferrer">
                       <MessageCircle className="mr-2 h-4 w-4" />
