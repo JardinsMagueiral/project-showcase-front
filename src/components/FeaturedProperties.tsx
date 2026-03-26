@@ -1,15 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Bed, Bath, Car, Maximize, ArrowRight, Building, ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bed, Bath, Car, Maximize, ArrowRight, Building, ChevronDown, ChevronUp, X, SlidersHorizontal } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export function FeaturedProperties() {
   const [showAll, setShowAll] = useState(false);
+  const [tipo, setTipo] = useState("");
+  const [operacao, setOperacao] = useState("");
+  const [quartos, setQuartos] = useState("");
+  const [banheiros, setBanheiros] = useState("");
+  const [precoMin, setPrecoMin] = useState("");
+  const [precoMax, setPrecoMax] = useState("");
+
   const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(price);
 
   const { data: imoveis = [], isLoading } = useQuery({
@@ -25,11 +34,92 @@ export function FeaturedProperties() {
     },
   });
 
+  const filteredImoveis = useMemo(() => {
+    if (!showAll) return imoveis;
+    return imoveis.filter((imovel) => {
+      if (tipo && imovel.tipo !== tipo) return false;
+      if (operacao && imovel.operacao !== operacao) return false;
+      if (quartos && (imovel.quartos ?? 0) < Number(quartos)) return false;
+      if (banheiros && (imovel.banheiros ?? 0) < Number(banheiros)) return false;
+      if (precoMin && imovel.preco < Number(precoMin)) return false;
+      if (precoMax && imovel.preco > Number(precoMax)) return false;
+      return true;
+    });
+  }, [imoveis, showAll, tipo, operacao, quartos, banheiros, precoMin, precoMax]);
+
+  const hasActiveFilters = tipo || operacao || quartos || banheiros || precoMin || precoMax;
+
+  const clearFilters = () => {
+    setTipo("");
+    setOperacao("");
+    setQuartos("");
+    setBanheiros("");
+    setPrecoMin("");
+    setPrecoMax("");
+  };
+
   if (isLoading) {
     return (
       <section className="bg-muted/50 py-16">
         <div className="container px-4">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {showAll && (
+          <div className="mb-6 rounded-lg border bg-card p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <SlidersHorizontal className="h-4 w-4" /> Filtrar Imóveis
+              </h3>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
+                  <X className="mr-1 h-3 w-3" /> Limpar filtros
+                </Button>
+              )}
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+              <Select value={tipo} onValueChange={(v) => setTipo(v === "todos" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os tipos</SelectItem>
+                  <SelectItem value="apartamento">Apartamento</SelectItem>
+                  <SelectItem value="casa">Casa</SelectItem>
+                  <SelectItem value="kitnet">Kitnet</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={operacao} onValueChange={(v) => setOperacao(v === "todas" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Operação" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todas</SelectItem>
+                  <SelectItem value="venda">Venda</SelectItem>
+                  <SelectItem value="aluguel">Aluguel</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={quartos} onValueChange={(v) => setQuartos(v === "todos" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Quartos" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Quartos</SelectItem>
+                  <SelectItem value="1">1+</SelectItem>
+                  <SelectItem value="2">2+</SelectItem>
+                  <SelectItem value="3">3+</SelectItem>
+                  <SelectItem value="4">4+</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={banheiros} onValueChange={(v) => setBanheiros(v === "todos" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Banheiros" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Banheiros</SelectItem>
+                  <SelectItem value="1">1+</SelectItem>
+                  <SelectItem value="2">2+</SelectItem>
+                  <SelectItem value="3">3+</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input type="number" placeholder="Preço mín." value={precoMin} onChange={(e) => setPrecoMin(e.target.value)} />
+              <Input type="number" placeholder="Preço máx." value={precoMax} onChange={(e) => setPrecoMax(e.target.value)} />
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              {filteredImoveis.length} imóvel(is) encontrado(s)
+            </p>
+          </div>
+        )}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[1,2,3,4].map(i => <Skeleton key={i} className="h-72 rounded-lg" />)}
           </div>
         </div>
@@ -39,7 +129,7 @@ export function FeaturedProperties() {
 
   if (imoveis.length === 0) return null;
 
-  const visibleImoveis = showAll ? imoveis : imoveis.slice(0, 16);
+  const visibleImoveis = showAll ? filteredImoveis : imoveis.slice(0, 16);
   const hasMore = imoveis.length > 16;
 
   return (
@@ -85,11 +175,17 @@ export function FeaturedProperties() {
             );
           })}
         </div>
-        {hasMore && !showAll && (
+        {hasMore && (
           <div className="mt-8 text-center">
-            <Button variant="outline" size="lg" onClick={() => setShowAll(true)}>
-              Mostrar Mais <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
+            {showAll ? (
+              <Button variant="outline" size="lg" onClick={() => { setShowAll(false); clearFilters(); }}>
+                Mostrar Menos <ChevronUp className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button variant="outline" size="lg" onClick={() => setShowAll(true)}>
+                Mostrar Mais <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
         )}
         <div className="mt-6 text-center md:hidden">
