@@ -175,11 +175,17 @@ export function FeaturedProperties() {
             );
           })}
         </div>
-        {hasMore && !showAll && (
+        {hasMore && (
           <div className="mt-8 text-center">
-            <Button variant="outline" size="lg" onClick={() => setShowAll(true)}>
-              Mostrar Mais <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
+            {showAll ? (
+              <Button variant="outline" size="lg" onClick={() => { setShowAll(false); clearFilters(); }}>
+                Mostrar Menos <ChevronUp className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button variant="outline" size="lg" onClick={() => setShowAll(true)}>
+                Mostrar Mais <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
         )}
         <div className="mt-6 text-center md:hidden">
