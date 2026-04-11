@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Building, MessageCircle, Key, Bed, Bath, Car, Maximize } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
 
 const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(price);
 
 const Imoveis = () => {
+  const [searchParams] = useSearchParams();
   const { data: imoveis = [], isLoading } = useQuery({
     queryKey: ["imoveis-publicos"],
     queryFn: async () => {
@@ -24,6 +26,31 @@ const Imoveis = () => {
       return data;
     },
   });
+
+  const filteredImoveis = useMemo(() => {
+    const tipo = searchParams.get("tipo");
+    const operacao = searchParams.get("operacao");
+    const quartos = searchParams.get("quartos");
+    const banheiros = searchParams.get("banheiros");
+    const precoMin = searchParams.get("precoMin");
+    const precoMax = searchParams.get("precoMax");
+    const search = searchParams.get("search");
+
+    return imoveis.filter((imovel) => {
+      if (tipo && imovel.tipo !== tipo) return false;
+      if (operacao && imovel.operacao !== operacao) return false;
+      if (quartos && (imovel.quartos ?? 0) < Number(quartos)) return false;
+      if (banheiros && (imovel.banheiros ?? 0) < Number(banheiros)) return false;
+      if (precoMin && imovel.preco < Number(precoMin)) return false;
+      if (precoMax && imovel.preco > Number(precoMax)) return false;
+      if (search) {
+        const s = search.toLowerCase();
+        const match = imovel.endereco?.toLowerCase().includes(s) || imovel.bairro?.toLowerCase().includes(s) || imovel.tipo?.toLowerCase().includes(s);
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [imoveis, searchParams]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -39,14 +66,14 @@ const Imoveis = () => {
         </section>
         <section className="py-12">
           <div className="container px-4">
-            <p className="mb-6 text-muted-foreground">{imoveis.length} imóveis encontrados</p>
+            <p className="mb-6 text-muted-foreground">{filteredImoveis.length} imóveis encontrados</p>
             {isLoading ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {[1,2,3].map(i => <Skeleton key={i} className="h-72 rounded-lg" />)}
               </div>
             ) : (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {imoveis.map((imovel) => {
+                {filteredImoveis.map((imovel) => {
                   const foto = imovel.imovel_fotos?.sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))[0];
                   return (
                     <Link key={imovel.id} to={`/imoveis/${imovel.id}`}>
