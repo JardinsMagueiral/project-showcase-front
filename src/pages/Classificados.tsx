@@ -3,14 +3,17 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Tag } from "lucide-react";
+import { Tag, LogIn, MessageCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const formatPrice = (price: number) => price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export default function Classificados() {
+  const { user } = useAuth();
   const { data: classificados = [], isLoading } = useQuery({
     queryKey: ["classificados-publicos"],
     queryFn: async () => {
@@ -33,6 +36,21 @@ export default function Classificados() {
             <Tag className="mx-auto mb-4 h-10 w-10 text-primary" />
             <h1 className="font-serif text-3xl font-bold md:text-4xl">Desapegos</h1>
             <p className="mx-auto mt-2 max-w-xl text-muted-foreground">Compre e venda itens com seus vizinhos do Jardins Mangueiral</p>
+            <div className="mt-6">
+              {user ? (
+                <Button size="lg" variant="whatsapp" asChild>
+                  <a href="https://wa.me/5561991647984?text=Olá! Gostaria de anunciar um item nos Desapegos." target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="mr-2 h-5 w-5" /> Anunciar Item
+                  </a>
+                </Button>
+              ) : (
+                <Button size="lg" asChild>
+                  <Link to="/login">
+                    <LogIn className="mr-2 h-5 w-5" /> Faça login para anunciar
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         </section>
         <section className="py-8">

@@ -27,6 +27,31 @@ const Imoveis = () => {
     },
   });
 
+  const filteredImoveis = useMemo(() => {
+    const tipo = searchParams.get("tipo");
+    const operacao = searchParams.get("operacao");
+    const quartos = searchParams.get("quartos");
+    const banheiros = searchParams.get("banheiros");
+    const precoMin = searchParams.get("precoMin");
+    const precoMax = searchParams.get("precoMax");
+    const search = searchParams.get("search");
+
+    return imoveis.filter((imovel) => {
+      if (tipo && imovel.tipo !== tipo) return false;
+      if (operacao && imovel.operacao !== operacao) return false;
+      if (quartos && (imovel.quartos ?? 0) < Number(quartos)) return false;
+      if (banheiros && (imovel.banheiros ?? 0) < Number(banheiros)) return false;
+      if (precoMin && imovel.preco < Number(precoMin)) return false;
+      if (precoMax && imovel.preco > Number(precoMax)) return false;
+      if (search) {
+        const s = search.toLowerCase();
+        const match = imovel.endereco?.toLowerCase().includes(s) || imovel.bairro?.toLowerCase().includes(s) || imovel.tipo?.toLowerCase().includes(s);
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [imoveis, searchParams]);
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
@@ -48,7 +73,7 @@ const Imoveis = () => {
               </div>
             ) : (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {imoveis.map((imovel) => {
+                {filteredImoveis.map((imovel) => {
                   const foto = imovel.imovel_fotos?.sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))[0];
                   return (
                     <Link key={imovel.id} to={`/imoveis/${imovel.id}`}>
