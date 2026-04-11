@@ -155,10 +155,10 @@ export function Header() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
+                <Button variant="outline" size="sm" className="gap-2">
                   <User className="h-4 w-4" />
-                  <span className="max-w-[120px] truncate">{userName}</span>
-                  <ChevronDown className="h-3 w-3" />
+                  <span className="max-w-[120px] truncate hidden sm:inline">{userName}</span>
+                  <ChevronDown className="h-3 w-3 hidden sm:inline" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
