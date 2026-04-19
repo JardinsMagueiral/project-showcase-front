@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link, useSearchParams } from "react-router-dom";
-import { Building, MessageCircle, Key, Bed, Bath, Car, Maximize } from "lucide-react";
+import { Building, MessageCircle, Key, Bed, Bath, Car, Maximize, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemo } from "react";
@@ -13,7 +15,7 @@ import { useMemo } from "react";
 const formatPrice = (price: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(price);
 
 const Imoveis = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: imoveis = [], isLoading } = useQuery({
     queryKey: ["imoveis-publicos"],
     queryFn: async () => {
@@ -27,20 +29,28 @@ const Imoveis = () => {
     },
   });
 
-  const filteredImoveis = useMemo(() => {
-    const tipo = searchParams.get("tipo");
-    const operacao = searchParams.get("operacao");
-    const quartos = searchParams.get("quartos");
-    const banheiros = searchParams.get("banheiros");
-    const precoMin = searchParams.get("precoMin");
-    const precoMax = searchParams.get("precoMax");
-    const search = searchParams.get("search");
+  const updateParam = (key: string, value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (!value || value === "all") next.delete(key);
+    else next.set(key, value);
+    setSearchParams(next, { replace: true });
+  };
 
+  const tipo = searchParams.get("tipo") ?? "all";
+  const operacao = searchParams.get("operacao") ?? "all";
+  const quartos = searchParams.get("quartos") ?? "all";
+  const banheiros = searchParams.get("banheiros") ?? "all";
+  const precoMin = searchParams.get("precoMin") ?? "";
+  const precoMax = searchParams.get("precoMax") ?? "";
+  const hasFilters = Array.from(searchParams.keys()).length > 0;
+
+  const filteredImoveis = useMemo(() => {
+    const search = searchParams.get("search");
     return imoveis.filter((imovel) => {
-      if (tipo && imovel.tipo !== tipo) return false;
-      if (operacao && imovel.operacao !== operacao) return false;
-      if (quartos && (imovel.quartos ?? 0) < Number(quartos)) return false;
-      if (banheiros && (imovel.banheiros ?? 0) < Number(banheiros)) return false;
+      if (tipo !== "all" && imovel.tipo !== tipo) return false;
+      if (operacao !== "all" && imovel.operacao !== operacao) return false;
+      if (quartos !== "all" && (imovel.quartos ?? 0) < Number(quartos)) return false;
+      if (banheiros !== "all" && (imovel.banheiros ?? 0) < Number(banheiros)) return false;
       if (precoMin && imovel.preco < Number(precoMin)) return false;
       if (precoMax && imovel.preco > Number(precoMax)) return false;
       if (search) {
@@ -50,7 +60,7 @@ const Imoveis = () => {
       }
       return true;
     });
-  }, [imoveis, searchParams]);
+  }, [imoveis, tipo, operacao, quartos, banheiros, precoMin, precoMax, searchParams]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -66,6 +76,56 @@ const Imoveis = () => {
         </section>
         <section className="py-12">
           <div className="container px-4">
+            <div className="mb-6 rounded-lg border bg-card p-4">
+              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+                <Select value={tipo} onValueChange={(v) => updateParam("tipo", v)}>
+                  <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os tipos</SelectItem>
+                    <SelectItem value="apartamento">Apartamento</SelectItem>
+                    <SelectItem value="casa">Casa</SelectItem>
+                    <SelectItem value="cobertura">Cobertura</SelectItem>
+                    <SelectItem value="kitnet">Kitnet</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={operacao} onValueChange={(v) => updateParam("operacao", v)}>
+                  <SelectTrigger><SelectValue placeholder="Operação" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Comprar e alugar</SelectItem>
+                    <SelectItem value="venda">Comprar</SelectItem>
+                    <SelectItem value="aluguel">Alugar</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={quartos} onValueChange={(v) => updateParam("quartos", v)}>
+                  <SelectTrigger><SelectValue placeholder="Quartos" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Quartos</SelectItem>
+                    <SelectItem value="1">1+</SelectItem>
+                    <SelectItem value="2">2+</SelectItem>
+                    <SelectItem value="3">3+</SelectItem>
+                    <SelectItem value="4">4+</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={banheiros} onValueChange={(v) => updateParam("banheiros", v)}>
+                  <SelectTrigger><SelectValue placeholder="Banheiros" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Banheiros</SelectItem>
+                    <SelectItem value="1">1+</SelectItem>
+                    <SelectItem value="2">2+</SelectItem>
+                    <SelectItem value="3">3+</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input type="number" inputMode="numeric" placeholder="Preço mín." value={precoMin} onChange={(e) => updateParam("precoMin", e.target.value)} />
+                <Input type="number" inputMode="numeric" placeholder="Preço máx." value={precoMax} onChange={(e) => updateParam("precoMax", e.target.value)} />
+              </div>
+              {hasFilters && (
+                <div className="mt-3 flex justify-end">
+                  <Button variant="ghost" size="sm" onClick={() => setSearchParams(new URLSearchParams(), { replace: true })}>
+                    <X className="mr-1 h-4 w-4" /> Limpar filtros
+                  </Button>
+                </div>
+              )}
+            </div>
             <p className="mb-6 text-muted-foreground">{filteredImoveis.length} imóveis encontrados</p>
             {isLoading ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
