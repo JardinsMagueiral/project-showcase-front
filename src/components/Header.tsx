@@ -67,7 +67,8 @@ export function Header() {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const userName = user?.user_metadata?.nome || user?.email || "Usuário";
+  const fullName = user?.user_metadata?.nome || user?.email || "Usuário";
+  const userName = fullName.split(" ")[0].split("@")[0];
 
   const handleSignOut = async () => {
     await signOut();
