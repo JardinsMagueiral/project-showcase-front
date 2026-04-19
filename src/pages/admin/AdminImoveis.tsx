@@ -102,20 +102,38 @@ export default function AdminImoveis() {
             <Card><CardContent className="py-8 text-center"><p className="text-muted-foreground">Nenhum imóvel encontrado</p></CardContent></Card>
           ) : (
             <div className="space-y-4">
-              {filteredImoveis.map((imovel) => (
+              {filteredImoveis.map((imovel) => {
+                const fotos = ((imovel as any).imovel_fotos || []).sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0));
+                const fotoPrincipal = fotos[0];
+                return (
                 <Card key={imovel.id}>
                   <CardContent className="p-4">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold capitalize">{imovel.tipo} para {imovel.operacao}</h3>
-                          {getStatusBadge(imovel.status)}
-                          {imovel.destaque && <Badge variant="outline" className="border-yellow-500 text-yellow-600"><Star className="mr-1 h-3 w-3 fill-current" />Destaque</Badge>}
+                      <div className="flex flex-1 gap-4">
+                        <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-muted sm:h-28 sm:w-28">
+                          {fotoPrincipal ? (
+                            <img src={fotoPrincipal.url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Sem foto</div>
+                          )}
+                          {fotos.length > 0 && (
+                            <span className="absolute bottom-1 right-1 rounded bg-background/90 px-1.5 py-0.5 text-xs font-medium">
+                              {fotos.length} foto{fotos.length > 1 ? "s" : ""}
+                            </span>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground">{imovel.endereco}, {imovel.bairro}</p>
-                        <p className="text-lg font-bold text-primary">{formatPrice(imovel.preco)}</p>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-semibold capitalize">{imovel.tipo} para {imovel.operacao}</h3>
+                            {getStatusBadge(imovel.status)}
+                            {imovel.destaque && <Badge variant="outline" className="border-yellow-500 text-yellow-600"><Star className="mr-1 h-3 w-3 fill-current" />Destaque</Badge>}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{imovel.endereco}, {imovel.bairro}</p>
+                          <p className="text-lg font-bold text-primary">{formatPrice(imovel.preco)}</p>
+                        </div>
                       </div>
                       <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" asChild><Link to={`/admin/imoveis/${imovel.id}/editar`}><Pencil className="mr-1 h-4 w-4" />Editar fotos e dados</Link></Button>
                         {imovel.status === "pendente" && (
                           <>
                             <Button size="sm" onClick={() => updateStatus(imovel.id, "aprovado")}><Check className="mr-1 h-4 w-4" />Aprovar</Button>
@@ -125,7 +143,6 @@ export default function AdminImoveis() {
                         <Button variant="outline" size="sm" onClick={() => toggleDestaque(imovel.id, !!imovel.destaque)}>
                           {imovel.destaque ? <><StarOff className="mr-1 h-4 w-4" />Remover Destaque</> : <><Star className="mr-1 h-4 w-4" />Destacar</>}
                         </Button>
-                        <Button variant="outline" size="sm" asChild><Link to={`/admin/imoveis/${imovel.id}/editar`}><Pencil className="mr-1 h-4 w-4" />Editar</Link></Button>
                         <Button variant="outline" size="sm" asChild><Link to={`/imoveis/${imovel.id}`}><Eye className="mr-1 h-4 w-4" />Ver</Link></Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild><Button variant="destructive" size="sm"><Trash2 className="mr-1 h-4 w-4" />Excluir</Button></AlertDialogTrigger>
@@ -138,7 +155,8 @@ export default function AdminImoveis() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
