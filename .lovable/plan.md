@@ -1,51 +1,24 @@
 
 
-## Plano: 5 correções
+## Problema
 
-### 1. Filtros nos imóveis ao clicar "Ver Todos"
+Ao clicar em "Mostrar Mais" na home, os imóveis expandem mas os filtros não aparecem no mobile (viewport 390px). Olhando o código atual em `FeaturedProperties.tsx`, os filtros JÁ existem dentro do bloco `if (isLoading)` — ou seja, só aparecem durante o carregamento, e ficam fora do retorno principal. Isso é um bug de estrutura.
 
-O botão "Ver Todos" (desktop e mobile) leva para `/imoveis` sem filtros. A página `/imoveis` (`src/pages/Imoveis.tsx`) não lê query params para filtrar. O `PropertySearch` já envia filtros via query params mas a página ignora.
+## Solução
 
-**Arquivo: `src/pages/Imoveis.tsx`**
-- Ler query params (`useSearchParams`) para `tipo`, `operacao`, `quartos`, `banheiros`, `precoMin`, `precoMax`, `search`
-- Filtrar client-side o array de imóveis com base nesses params
+Mover o bloco de filtros (que está erroneamente dentro do `if (isLoading)`) para o retorno principal do componente, posicionado logo após o cabeçalho da seção, condicional ao `showAll`.
 
-### 2. Botão "Login para anunciar" nos Desapegos
+## Alteração
 
-**Arquivo: `src/pages/Classificados.tsx`**
-- Importar `useAuth` e `Button`
-- Adicionar seção CTA: se não logado, botão "Faça login para anunciar"; se logado, botão para criar anúncio (ou link para contato)
+**Arquivo: `src/components/FeaturedProperties.tsx`**
 
-### 3. Grupos WhatsApp no rodapé via Supabase
-
-O projeto original busca os grupos da tabela `whatsapp_grupos` no footer. O atual usa lista hardcoded.
-
-**Arquivo: `src/components/Footer.tsx`**
-- Importar `useState`, `useEffect`, `supabase`
-- Buscar grupos de `whatsapp_grupos` (ativo=true, order by ordem) no `useEffect`
-- Substituir o array hardcoded `footerGroups` pelos dados do banco
-
-### 4. Botão "Entrar" ainda aparece quando logado (mobile)
-
-O Header desktop já funciona (`hidden sm:flex`), mas no mobile o botão do dropdown do usuário tem `className="hidden sm:flex"` — então em telas < 640px o botão do usuário some e nada aparece.
-
-**Arquivo: `src/components/Header.tsx`**
-- O `DropdownMenuTrigger` do usuário logado (linha 158) tem `className="hidden sm:flex"` — o botão some no mobile
-- Precisa adicionar uma versão do botão de usuário visível no mobile (antes do menu hamburger), ou garantir que o dropdown funcione em todas as telas (remover `hidden sm:flex` ou usar `flex` sem restrição)
-
-### 5. Nome na aba do navegador mostra "lovableapp"
-
-O `<title>` no `index.html` já diz "Jardins Mangueiral", mas na URL publicada (`jardinsmanguerak.lovable.app`) o Lovable pode injetar seu próprio título. Vamos garantir que o título esteja correto no HTML e também adicionar um `document.title` no `main.tsx` como fallback.
-
-**Arquivo: `index.html`**
-- Verificar/manter `<title>Jardins Mangueiral</title>` (já está correto)
-- Remover os comentários TODO que mencionam "Lovable"
-
-**Arquivo: `src/main.tsx`**
-- Adicionar `document.title = "Jardins Mangueiral"` como segurança
+1. Remover o bloco de filtros que está dentro do `if (isLoading)` (linhas ~62-114) — manter o loading limpo
+2. Inserir o mesmo bloco de filtros no retorno principal, logo após o `<div className="mb-8 flex items-center justify-between">` do cabeçalho, condicional a `showAll`
+3. Garantir que o grid responsivo dos filtros funcione bem no mobile (já usa `grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6`)
 
 ### Detalhes técnicos
 
-- Nenhuma migração de banco necessária
-- 5 arquivos alterados: `Footer.tsx`, `Header.tsx`, `Imoveis.tsx`, `Classificados.tsx`, `index.html`/`main.tsx`
+- Nenhuma mudança de lógica — estados, `useMemo` e handlers já estão corretos
+- Apenas reposicionamento JSX
+- Filtros aparecerão imediatamente quando o usuário clicar "Mostrar Mais"
 
