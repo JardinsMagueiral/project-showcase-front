@@ -23,7 +23,7 @@ export default function AdminImoveis() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("imoveis")
-        .select("*")
+        .select("*, imovel_fotos(url, ordem)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
