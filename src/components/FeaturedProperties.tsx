@@ -62,6 +62,31 @@ export function FeaturedProperties() {
     return (
       <section className="bg-muted/50 py-16">
         <div className="container px-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-72 rounded-lg" />)}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (imoveis.length === 0) return null;
+
+  const visibleImoveis = showAll ? filteredImoveis : imoveis.slice(0, 16);
+  const hasMore = imoveis.length > 16;
+
+  return (
+    <section className="bg-muted/50 py-16">
+      <div className="container px-4">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="font-serif text-3xl font-bold text-foreground">Imóveis Disponíveis</h2>
+            <p className="mt-2 text-muted-foreground">Confira as oportunidades mais recentes do Jardins Mangueiral</p>
+          </div>
+          <Button variant="outline" asChild className="hidden md:flex">
+            <Link to="/imoveis">Ver Todos <ArrowRight className="ml-2 h-4 w-4" /></Link>
+          </Button>
+        </div>
         {showAll && (
           <div className="mb-6 rounded-lg border bg-card p-4">
             <div className="mb-3 flex items-center justify-between">
@@ -119,31 +144,6 @@ export function FeaturedProperties() {
             </p>
           </div>
         )}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {[1,2,3,4].map(i => <Skeleton key={i} className="h-72 rounded-lg" />)}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (imoveis.length === 0) return null;
-
-  const visibleImoveis = showAll ? filteredImoveis : imoveis.slice(0, 16);
-  const hasMore = imoveis.length > 16;
-
-  return (
-    <section className="bg-muted/50 py-16">
-      <div className="container px-4">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h2 className="font-serif text-3xl font-bold text-foreground">Imóveis Disponíveis</h2>
-            <p className="mt-2 text-muted-foreground">Confira as oportunidades mais recentes do Jardins Mangueiral</p>
-          </div>
-          <Button variant="outline" asChild className="hidden md:flex">
-            <Link to="/imoveis">Ver Todos <ArrowRight className="ml-2 h-4 w-4" /></Link>
-          </Button>
-        </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visibleImoveis.map((imovel) => {
             const foto = imovel.imovel_fotos?.sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))[0];
