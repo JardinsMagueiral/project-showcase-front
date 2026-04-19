@@ -2,23 +2,29 @@
 
 ## Problema
 
-Ao clicar em "Mostrar Mais" na home, os imóveis expandem mas os filtros não aparecem no mobile (viewport 390px). Olhando o código atual em `FeaturedProperties.tsx`, os filtros JÁ existem dentro do bloco `if (isLoading)` — ou seja, só aparecem durante o carregamento, e ficam fora do retorno principal. Isso é um bug de estrutura.
+Ao clicar "Ver Mais" / "Ver Todos" os Imóveis, o usuário vai para `/imoveis`. Essa página não mostra filtros visíveis — apenas aplica filtros vindos da URL (query params). Sem barra de filtros, o usuário não consegue alterar os critérios na própria página.
 
 ## Solução
 
-Mover o bloco de filtros (que está erroneamente dentro do `if (isLoading)`) para o retorno principal do componente, posicionado logo após o cabeçalho da seção, condicional ao `showAll`.
+Adicionar uma barra de filtros inline no topo da listagem em `/imoveis`, igual à do `FeaturedProperties` (Tipo, Operação, Quartos, Banheiros, Preço mín/máx). Os filtros sincronizam com a URL via `setSearchParams`, preservando os valores que vieram da home/PropertySearch e permitindo alteração.
 
 ## Alteração
 
-**Arquivo: `src/components/FeaturedProperties.tsx`**
+**Arquivo: `src/pages/Imoveis.tsx`**
 
-1. Remover o bloco de filtros que está dentro do `if (isLoading)` (linhas ~62-114) — manter o loading limpo
-2. Inserir o mesmo bloco de filtros no retorno principal, logo após o `<div className="mb-8 flex items-center justify-between">` do cabeçalho, condicional a `showAll`
-3. Garantir que o grid responsivo dos filtros funcione bem no mobile (já usa `grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6`)
+1. Trocar `useSearchParams` para usar tanto leitura quanto escrita: `const [searchParams, setSearchParams] = useSearchParams()`
+2. Adicionar bloco de filtros logo abaixo do hero, antes da contagem de resultados:
+   - Selects: Tipo, Operação, Quartos, Banheiros
+   - Inputs: Preço mín., Preço máx.
+   - Botão "Limpar filtros" quando houver algum ativo
+3. Cada alteração chama `setSearchParams` atualizando o param correspondente (removendo se vazio)
+4. Layout responsivo: `grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6` (funciona bem em 390px)
+5. Manter toda a lógica existente de `filteredImoveis` (já lê de `searchParams`)
 
 ### Detalhes técnicos
 
-- Nenhuma mudança de lógica — estados, `useMemo` e handlers já estão corretos
-- Apenas reposicionamento JSX
-- Filtros aparecerão imediatamente quando o usuário clicar "Mostrar Mais"
+- Sem mudanças de banco
+- Sem novas rotas
+- Filtros refletidos na URL (compartilháveis e persistentes)
+- Valores iniciais vêm dos query params da URL — então filtros aplicados na home aparecem pré-preenchidos
 
