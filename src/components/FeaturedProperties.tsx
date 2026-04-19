@@ -87,6 +87,63 @@ export function FeaturedProperties() {
             <Link to="/imoveis">Ver Todos <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
+        {showAll && (
+          <div className="mb-6 rounded-lg border bg-card p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <SlidersHorizontal className="h-4 w-4" /> Filtrar Imóveis
+              </h3>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
+                  <X className="mr-1 h-3 w-3" /> Limpar filtros
+                </Button>
+              )}
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+              <Select value={tipo} onValueChange={(v) => setTipo(v === "todos" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os tipos</SelectItem>
+                  <SelectItem value="apartamento">Apartamento</SelectItem>
+                  <SelectItem value="casa">Casa</SelectItem>
+                  <SelectItem value="kitnet">Kitnet</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={operacao} onValueChange={(v) => setOperacao(v === "todas" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Operação" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todas</SelectItem>
+                  <SelectItem value="venda">Venda</SelectItem>
+                  <SelectItem value="aluguel">Aluguel</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={quartos} onValueChange={(v) => setQuartos(v === "todos" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Quartos" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Quartos</SelectItem>
+                  <SelectItem value="1">1+</SelectItem>
+                  <SelectItem value="2">2+</SelectItem>
+                  <SelectItem value="3">3+</SelectItem>
+                  <SelectItem value="4">4+</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={banheiros} onValueChange={(v) => setBanheiros(v === "todos" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Banheiros" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Banheiros</SelectItem>
+                  <SelectItem value="1">1+</SelectItem>
+                  <SelectItem value="2">2+</SelectItem>
+                  <SelectItem value="3">3+</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input type="number" placeholder="Preço mín." value={precoMin} onChange={(e) => setPrecoMin(e.target.value)} />
+              <Input type="number" placeholder="Preço máx." value={precoMax} onChange={(e) => setPrecoMax(e.target.value)} />
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              {filteredImoveis.length} imóvel(is) encontrado(s)
+            </p>
+          </div>
+        )}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visibleImoveis.map((imovel) => {
             const foto = imovel.imovel_fotos?.sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))[0];
