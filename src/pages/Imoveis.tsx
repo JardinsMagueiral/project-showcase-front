@@ -86,6 +86,7 @@ const Imoveis = () => {
                     <SelectItem value="casa">Casa</SelectItem>
                     <SelectItem value="cobertura">Cobertura</SelectItem>
                     <SelectItem value="kitnet">Kitnet</SelectItem>
+                    <SelectItem value="loja">Loja</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={operacao} onValueChange={(v) => updateParam("operacao", v)}>
