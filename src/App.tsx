@@ -34,7 +34,15 @@ import AdminClientes from "./pages/admin/AdminClientes";
 import AdminNoticias from "./pages/admin/AdminNoticias";
 import AdminGrupos from "./pages/admin/AdminGrupos";
 import AdminQuadras from "./pages/admin/AdminQuadras";
-
+import CrmDashboard from "./pages/crm/CrmDashboard";
+import CrmLeads from "./pages/crm/CrmLeads";
+import CrmLeadDetalhe from "./pages/crm/CrmLeadDetalhe";
+import CrmFunil from "./pages/crm/CrmFunil";
+import CrmAgenda from "./pages/crm/CrmAgenda";
+import CrmAutomacoes from "./pages/crm/CrmAutomacoes";
+import CrmTemplates from "./pages/crm/CrmTemplates";
+import CrmMatching from "./pages/crm/CrmMatching";
+import CrmMetricas from "./pages/crm/CrmMetricas";
 const queryClient = new QueryClient();
 
 const App = () => (
