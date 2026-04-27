@@ -250,7 +250,15 @@ export function Header() {
                           </Link>
                         </Button>
                       )}
-                      <Button variant="outline" className={isAdmin ? "mt-2" : "mt-4"} onClick={() => { handleSignOut(); setIsOpen(false); }}>
+                      {hasCrmAccess && (
+                        <Button variant="outline" className={isAdmin ? "mt-2" : "mt-4"} asChild>
+                          <Link to="/crm" onClick={() => setIsOpen(false)}>
+                            <Briefcase className="mr-2 h-4 w-4" />
+                            CRM
+                          </Link>
+                        </Button>
+                      )}
+                      <Button variant="outline" className={(isAdmin || hasCrmAccess) ? "mt-2" : "mt-4"} onClick={() => { handleSignOut(); setIsOpen(false); }}>
                         <LogOut className="mr-2 h-4 w-4" />
                         Sair ({userName})
                       </Button>
