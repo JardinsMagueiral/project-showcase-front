@@ -64,7 +64,7 @@ const menuItems = [{
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [quadrasOpen, setQuadrasOpen] = useState(false);
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, hasCrmAccess, signOut } = useAuth();
   const navigate = useNavigate();
 
   const fullName = user?.user_metadata?.nome || user?.email || "Usuário";
