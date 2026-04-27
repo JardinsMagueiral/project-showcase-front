@@ -171,6 +171,14 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                 )}
+                {hasCrmAccess && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/crm" className="cursor-pointer">
+                      <Briefcase className="mr-2 h-4 w-4" />
+                      CRM
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sair
