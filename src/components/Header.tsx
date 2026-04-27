@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight, LogIn, User, LogOut, Shield } from "lucide-react";
+import { Menu, Home, Users, Building, Handshake, MessageCircle, Phone, Calendar, Calculator, Tag, ChevronDown, ChevronRight, LogIn, User, LogOut, Shield, Briefcase } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -64,7 +64,7 @@ const menuItems = [{
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [quadrasOpen, setQuadrasOpen] = useState(false);
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, hasCrmAccess, signOut } = useAuth();
   const navigate = useNavigate();
 
   const fullName = user?.user_metadata?.nome || user?.email || "Usuário";
@@ -171,6 +171,14 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                 )}
+                {hasCrmAccess && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/crm" className="cursor-pointer">
+                      <Briefcase className="mr-2 h-4 w-4" />
+                      CRM
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sair
@@ -242,7 +250,15 @@ export function Header() {
                           </Link>
                         </Button>
                       )}
-                      <Button variant="outline" className={isAdmin ? "mt-2" : "mt-4"} onClick={() => { handleSignOut(); setIsOpen(false); }}>
+                      {hasCrmAccess && (
+                        <Button variant="outline" className={isAdmin ? "mt-2" : "mt-4"} asChild>
+                          <Link to="/crm" onClick={() => setIsOpen(false)}>
+                            <Briefcase className="mr-2 h-4 w-4" />
+                            CRM
+                          </Link>
+                        </Button>
+                      )}
+                      <Button variant="outline" className={(isAdmin || hasCrmAccess) ? "mt-2" : "mt-4"} onClick={() => { handleSignOut(); setIsOpen(false); }}>
                         <LogOut className="mr-2 h-4 w-4" />
                         Sair ({userName})
                       </Button>

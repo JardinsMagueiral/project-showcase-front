@@ -2,8 +2,14 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
-export function ProtectedRoute({ children, requireAdmin = false }: { children: React.ReactNode; requireAdmin?: boolean }) {
-  const { user, loading, isAdmin } = useAuth();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requireAdmin?: boolean;
+  requireCrm?: boolean;
+}
+
+export function ProtectedRoute({ children, requireAdmin = false, requireCrm = false }: ProtectedRouteProps) {
+  const { user, loading, isAdmin, hasCrmAccess } = useAuth();
 
   if (loading) {
     return (
@@ -15,6 +21,7 @@ export function ProtectedRoute({ children, requireAdmin = false }: { children: R
 
   if (!user) return <Navigate to="/login" replace />;
   if (requireAdmin && !isAdmin) return <Navigate to="/" replace />;
+  if (requireCrm && !hasCrmAccess) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }
