@@ -81,6 +81,15 @@ const App = () => (
             <Route path="/admin/noticias" element={<ProtectedRoute requireAdmin><AdminNoticias /></ProtectedRoute>} />
             <Route path="/admin/grupos" element={<ProtectedRoute requireAdmin><AdminGrupos /></ProtectedRoute>} />
             <Route path="/admin/quadras" element={<ProtectedRoute requireAdmin><AdminQuadras /></ProtectedRoute>} />
+            <Route path="/crm" element={<ProtectedRoute requireCrm><CrmDashboard /></ProtectedRoute>} />
+            <Route path="/crm/leads" element={<ProtectedRoute requireCrm><CrmLeads /></ProtectedRoute>} />
+            <Route path="/crm/leads/:id" element={<ProtectedRoute requireCrm><CrmLeadDetalhe /></ProtectedRoute>} />
+            <Route path="/crm/funil" element={<ProtectedRoute requireCrm><CrmFunil /></ProtectedRoute>} />
+            <Route path="/crm/agenda" element={<ProtectedRoute requireCrm><CrmAgenda /></ProtectedRoute>} />
+            <Route path="/crm/automacoes" element={<ProtectedRoute requireCrm><CrmAutomacoes /></ProtectedRoute>} />
+            <Route path="/crm/templates" element={<ProtectedRoute requireCrm><CrmTemplates /></ProtectedRoute>} />
+            <Route path="/crm/matching" element={<ProtectedRoute requireCrm><CrmMatching /></ProtectedRoute>} />
+            <Route path="/crm/metricas" element={<ProtectedRoute requireCrm><CrmMetricas /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
