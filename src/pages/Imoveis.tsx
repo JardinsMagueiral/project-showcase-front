@@ -76,7 +76,13 @@ const Imoveis = () => {
         </section>
         <section className="py-12">
           <div className="container px-4">
-            <div className="mb-6 rounded-lg border bg-card p-4">
+            <div className="mb-6 rounded-lg border bg-card p-4 space-y-3">
+              <Input
+                type="search"
+                placeholder="Buscar por endereço, bairro ou tipo..."
+                value={searchParams.get("search") ?? ""}
+                onChange={(e) => updateParam("search", e.target.value)}
+              />
               <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
                 <Select value={tipo} onValueChange={(v) => updateParam("tipo", v)}>
                   <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
@@ -92,7 +98,7 @@ const Imoveis = () => {
                 <Select value={operacao} onValueChange={(v) => updateParam("operacao", v)}>
                   <SelectTrigger><SelectValue placeholder="Operação" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Comprar e alugar</SelectItem>
+                    <SelectItem value="all">Todas operações</SelectItem>
                     <SelectItem value="venda">Comprar</SelectItem>
                     <SelectItem value="aluguel">Alugar</SelectItem>
                   </SelectContent>
@@ -100,7 +106,7 @@ const Imoveis = () => {
                 <Select value={quartos} onValueChange={(v) => updateParam("quartos", v)}>
                   <SelectTrigger><SelectValue placeholder="Quartos" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Quartos</SelectItem>
+                    <SelectItem value="all">Todos os quartos</SelectItem>
                     <SelectItem value="1">1+</SelectItem>
                     <SelectItem value="2">2+</SelectItem>
                     <SelectItem value="3">3+</SelectItem>
@@ -110,7 +116,7 @@ const Imoveis = () => {
                 <Select value={banheiros} onValueChange={(v) => updateParam("banheiros", v)}>
                   <SelectTrigger><SelectValue placeholder="Banheiros" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Banheiros</SelectItem>
+                    <SelectItem value="all">Todos os banheiros</SelectItem>
                     <SelectItem value="1">1+</SelectItem>
                     <SelectItem value="2">2+</SelectItem>
                     <SelectItem value="3">3+</SelectItem>
