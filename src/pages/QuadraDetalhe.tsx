@@ -58,8 +58,19 @@ export default function QuadraDetalhe() {
         <div className="container px-4">
           <Button variant="ghost" size="sm" className="mb-6" asChild><Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Início</Link></Button>
           <div className="grid gap-8 lg:grid-cols-2">
-            <div className="aspect-video overflow-hidden rounded-lg bg-muted flex items-center justify-center">
-              {fotos.length > 0 ? <img src={fotos[0].url} alt="" className="h-full w-full object-cover" /> : <Building className="h-16 w-16 text-muted-foreground" />}
+            <div className="space-y-3">
+              <div className="aspect-video overflow-hidden rounded-lg bg-muted flex items-center justify-center">
+                {fotos.length > 0 ? <img src={fotos[0].url} alt="Foto principal" className="h-full w-full object-cover" /> : <Building className="h-16 w-16 text-muted-foreground" />}
+              </div>
+              {fotos.length > 1 && (
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                  {fotos.slice(1).map((foto: any, i: number) => (
+                    <a key={foto.id} href={foto.url} target="_blank" rel="noopener noreferrer" className="aspect-square overflow-hidden rounded-md bg-muted">
+                      <img src={foto.url} alt={`Foto ${i + 2}`} className="h-full w-full object-cover transition-transform hover:scale-105" />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <h1 className="font-serif text-3xl font-bold mb-2">Quadra {String(quadra.numero).padStart(2, "0")}</h1>
