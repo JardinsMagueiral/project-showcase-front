@@ -47,7 +47,7 @@ const Imoveis = () => {
 
   const filteredImoveis = useMemo(() => {
     const search = searchParams.get("search");
-    return imoveis.filter((imovel) => {
+    const list = imoveis.filter((imovel) => {
       if (tipo !== "all" && imovel.tipo !== tipo) return false;
       if (operacao !== "all" && imovel.operacao !== operacao) return false;
       if (quartos !== "all" && (imovel.quartos ?? 0) < Number(quartos)) return false;
