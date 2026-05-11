@@ -40,13 +40,14 @@ const Imoveis = () => {
   const operacao = searchParams.get("operacao") ?? "all";
   const quartos = searchParams.get("quartos") ?? "all";
   const banheiros = searchParams.get("banheiros") ?? "all";
+  const ordenar = searchParams.get("ordenar") ?? "recentes";
   const precoMin = searchParams.get("precoMin") ?? "";
   const precoMax = searchParams.get("precoMax") ?? "";
   const hasFilters = Array.from(searchParams.keys()).length > 0;
 
   const filteredImoveis = useMemo(() => {
     const search = searchParams.get("search");
-    return imoveis.filter((imovel) => {
+    const list = imoveis.filter((imovel) => {
       if (tipo !== "all" && imovel.tipo !== tipo) return false;
       if (operacao !== "all" && imovel.operacao !== operacao) return false;
       if (quartos !== "all" && (imovel.quartos ?? 0) < Number(quartos)) return false;
@@ -60,7 +61,10 @@ const Imoveis = () => {
       }
       return true;
     });
-  }, [imoveis, tipo, operacao, quartos, banheiros, precoMin, precoMax, searchParams]);
+    if (ordenar === "preco_asc") list.sort((a, b) => (a.preco ?? 0) - (b.preco ?? 0));
+    else if (ordenar === "preco_desc") list.sort((a, b) => (b.preco ?? 0) - (a.preco ?? 0));
+    return list;
+  }, [imoveis, tipo, operacao, quartos, banheiros, precoMin, precoMax, searchParams, ordenar]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -124,6 +128,14 @@ const Imoveis = () => {
                 </Select>
                 <Input type="number" inputMode="numeric" placeholder="Preço mín." value={precoMin} onChange={(e) => updateParam("precoMin", e.target.value)} />
                 <Input type="number" inputMode="numeric" placeholder="Preço máx." value={precoMax} onChange={(e) => updateParam("precoMax", e.target.value)} />
+                <Select value={ordenar} onValueChange={(v) => updateParam("ordenar", v === "recentes" ? "" : v)}>
+                  <SelectTrigger><SelectValue placeholder="Ordenar" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recentes">Mais recentes</SelectItem>
+                    <SelectItem value="preco_asc">Menor preço</SelectItem>
+                    <SelectItem value="preco_desc">Maior preço</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               {hasFilters && (
                 <div className="mt-3 flex justify-end">
