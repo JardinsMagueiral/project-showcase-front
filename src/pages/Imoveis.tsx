@@ -128,6 +128,14 @@ const Imoveis = () => {
                 </Select>
                 <Input type="number" inputMode="numeric" placeholder="Preço mín." value={precoMin} onChange={(e) => updateParam("precoMin", e.target.value)} />
                 <Input type="number" inputMode="numeric" placeholder="Preço máx." value={precoMax} onChange={(e) => updateParam("precoMax", e.target.value)} />
+                <Select value={ordenar} onValueChange={(v) => updateParam("ordenar", v === "recentes" ? "" : v)}>
+                  <SelectTrigger><SelectValue placeholder="Ordenar" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recentes">Mais recentes</SelectItem>
+                    <SelectItem value="preco_asc">Menor preço</SelectItem>
+                    <SelectItem value="preco_desc">Maior preço</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               {hasFilters && (
                 <div className="mt-3 flex justify-end">
