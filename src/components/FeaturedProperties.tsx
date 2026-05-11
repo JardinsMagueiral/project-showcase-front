@@ -28,6 +28,7 @@ export function FeaturedProperties() {
         .from("imoveis")
         .select("*, imovel_fotos(url, ordem)")
         .eq("status", "aprovado")
+        .order("destaque", { ascending: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;

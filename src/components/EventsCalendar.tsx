@@ -66,7 +66,11 @@ export function EventsCalendar() {
                   <CardTitle>{selectedDate ? format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecione uma data"}</CardTitle>
                   <CardDescription>{eventsOnSelectedDate.length > 0 ? `${eventsOnSelectedDate.length} evento(s)` : "Nenhum evento nesta data"}</CardDescription>
                 </div>
-                <Button size="sm"><Plus className="mr-1 h-4 w-4" /> Sugerir Evento</Button>
+                <Button size="sm" asChild>
+                  <a href="https://wa.me/5561991647984?text=Ol%C3%A1%2C%20gostaria%20de%20sugerir%20um%20evento%20para%20o%20Jardins%20Mangueiral" target="_blank" rel="noopener noreferrer">
+                    <Plus className="mr-1 h-4 w-4" /> Sugerir Evento
+                  </a>
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
