@@ -40,6 +40,7 @@ const Imoveis = () => {
   const operacao = searchParams.get("operacao") ?? "all";
   const quartos = searchParams.get("quartos") ?? "all";
   const banheiros = searchParams.get("banheiros") ?? "all";
+  const ordenar = searchParams.get("ordenar") ?? "recentes";
   const precoMin = searchParams.get("precoMin") ?? "";
   const precoMax = searchParams.get("precoMax") ?? "";
   const hasFilters = Array.from(searchParams.keys()).length > 0;
@@ -60,7 +61,10 @@ const Imoveis = () => {
       }
       return true;
     });
-  }, [imoveis, tipo, operacao, quartos, banheiros, precoMin, precoMax, searchParams]);
+    if (ordenar === "preco_asc") list.sort((a, b) => (a.preco ?? 0) - (b.preco ?? 0));
+    else if (ordenar === "preco_desc") list.sort((a, b) => (b.preco ?? 0) - (a.preco ?? 0));
+    return list;
+  }, [imoveis, tipo, operacao, quartos, banheiros, precoMin, precoMax, searchParams, ordenar]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
