@@ -3,14 +3,30 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarDays, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarDays, Plus, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function EventsCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [open, setOpen] = useState(false);
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [data, setData] = useState<Date | undefined>(undefined);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
 
   const { data: eventos = [], isLoading } = useQuery({
     queryKey: ["eventos-publicos"],
@@ -24,6 +40,44 @@ export function EventsCalendar() {
       return data;
     },
   });
+
+  const sugerir = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("auth");
+      if (!titulo.trim() || !data) throw new Error("campos");
+      const { error } = await supabase.from("eventos").insert({
+        user_id: user.id,
+        titulo: titulo.trim(),
+        descricao: descricao.trim() || null,
+        data: format(data, "yyyy-MM-dd"),
+        status: "pendente",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Evento enviado! Aguardando aprovação do administrador.");
+      setOpen(false);
+      setTitulo("");
+      setDescricao("");
+      setData(undefined);
+      qc.invalidateQueries({ queryKey: ["eventos-publicos"] });
+    },
+    onError: (e: Error) => {
+      if (e.message === "campos") toast.error("Preencha título e data.");
+      else if (e.message === "auth") toast.error("Faça login para sugerir um evento.");
+      else toast.error("Erro ao enviar evento.");
+    },
+  });
+
+  const handleOpen = () => {
+    if (!user) {
+      toast.info("Faça login para sugerir um evento.");
+      navigate("/login");
+      return;
+    }
+    setData(selectedDate);
+    setOpen(true);
+  };
 
   const eventsOnSelectedDate = eventos.filter(
     (evento) => selectedDate && evento.data === format(selectedDate, "yyyy-MM-dd")
@@ -66,10 +120,8 @@ export function EventsCalendar() {
                   <CardTitle>{selectedDate ? format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecione uma data"}</CardTitle>
                   <CardDescription>{eventsOnSelectedDate.length > 0 ? `${eventsOnSelectedDate.length} evento(s)` : "Nenhum evento nesta data"}</CardDescription>
                 </div>
-                <Button size="sm" asChild>
-                  <a href="https://wa.me/5561991647984?text=Ol%C3%A1%2C%20gostaria%20de%20sugerir%20um%20evento%20para%20o%20Jardins%20Mangueiral" target="_blank" rel="noopener noreferrer">
-                    <Plus className="mr-1 h-4 w-4" /> Sugerir Evento
-                  </a>
+                <Button size="sm" onClick={handleOpen}>
+                  <Plus className="mr-1 h-4 w-4" /> Sugerir Evento
                 </Button>
               </div>
             </CardHeader>
@@ -90,6 +142,64 @@ export function EventsCalendar() {
           </Card>
         </div>
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sugerir Evento</DialogTitle>
+            <DialogDescription>
+              Preencha os dados do evento. Após envio, ele ficará pendente de aprovação pelo administrador.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="titulo">Título *</Label>
+              <Input id="titulo" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Nome do evento" />
+            </div>
+            <div className="space-y-2">
+              <Label>Data *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn("w-full justify-start text-left font-normal", !data && "text-muted-foreground")}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {data ? format(data, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecione a data"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={data}
+                    onSelect={setData}
+                    locale={ptBR}
+                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição</Label>
+              <Textarea
+                id="descricao"
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                placeholder="Detalhes do evento (horário, local, etc.)"
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button onClick={() => sugerir.mutate()} disabled={sugerir.isPending}>
+              {sugerir.isPending ? "Enviando..." : "Enviar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
