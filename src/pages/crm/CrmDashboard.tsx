@@ -1,94 +1,73 @@
 import { CrmLayout } from "@/components/crm/CrmLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, Flame, CalendarClock, TrendingUp, Building2 } from "lucide-react";
+import { useLeads, useAgenda } from "@/hooks/useCrm";
 import { Badge } from "@/components/ui/badge";
-import { Users, TrendingUp, Clock, Target, Flame, ArrowRight } from "lucide-react";
-import { MOCK_LEADS, MOCK_CORRETORES, STATUS_LABELS, STATUS_COLORS } from "@/lib/crmMockData";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { STATUS_LABELS, STATUS_ORDER, STATUS_COLORS, formatCurrency } from "@/lib/crmTypes";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function CrmDashboard() {
-  const total = MOCK_LEADS.length;
-  const ativos = MOCK_LEADS.filter(l => !["fechado","perdido"].includes(l.status)).length;
-  const fechados = MOCK_LEADS.filter(l => l.status === "fechado").length;
-  const conversao = Math.round((fechados / total) * 100);
-  const semContato7d = MOCK_LEADS.filter(l => (Date.now() - new Date(l.ultimoContato).getTime()) / 86400000 > 7).length;
-  const quentes = [...MOCK_LEADS].sort((a, b) => b.score - a.score).slice(0, 5);
+  const { data: leads = [], isLoading } = useLeads();
+  const { data: agenda = [] } = useAgenda();
 
-  const stats = [
-    { label: "Leads Ativos", value: ativos, icon: Users, color: "text-blue-600", bg: "bg-blue-500/10" },
-    { label: "Taxa de Conversão", value: `${conversao}%`, icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-500/10" },
-    { label: "Tempo médio fechamento", value: "32 dias", icon: Clock, color: "text-amber-600", bg: "bg-amber-500/10" },
-    { label: "Sem contato 7+ dias", value: semContato7d, icon: Target, color: "text-rose-600", bg: "bg-rose-500/10" },
-  ];
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const newToday = leads.filter((l) => new Date(l.created_at) >= today).length;
+  const hot = leads.filter((l) => l.score >= 75 && !["fechado", "perdido"].includes(l.status)).length;
+  const fechados = leads.filter((l) => l.status === "fechado").length;
+  const conversao = leads.length ? Math.round((fechados / leads.length) * 100) : 0;
+  const upcoming = agenda.filter((a) => !a.concluido && new Date(a.data) >= today).slice(0, 5);
 
   return (
     <CrmLayout>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="font-serif text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Visão geral do seu CRM</p>
+        <p className="text-muted-foreground">Visão geral do pipeline de vendas</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        {stats.map((s) => (
-          <Card key={s.label}>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{s.label}</p>
-                  <p className="mt-2 text-3xl font-bold">{s.value}</p>
-                </div>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${s.bg}`}>
-                  <s.icon className={`h-5 w-5 ${s.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        <KPI label="Leads totais" value={leads.length} icon={Users} />
+        <KPI label="Novos hoje" value={newToday} icon={TrendingUp} />
+        <KPI label="Leads quentes" value={hot} icon={Flame} />
+        <KPI label="Conversão" value={`${conversao}%`} icon={Building2} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2"><Flame className="h-5 w-5 text-orange-500" />Leads mais quentes</CardTitle>
-            <Button variant="ghost" size="sm" asChild><Link to="/crm/leads">Ver todos <ArrowRight className="ml-1 h-3 w-3" /></Link></Button>
-          </CardHeader>
+          <CardHeader><CardTitle>Funil de vendas</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            {quentes.map((l) => (
-              <Link key={l.id} to={`/crm/leads/${l.id}`} className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50">
-                <div>
-                  <p className="font-medium">{l.nome}</p>
-                  <p className="text-xs text-muted-foreground">{l.tipoImovel} • {l.interesse}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className={STATUS_COLORS[l.status]}>{STATUS_LABELS[l.status]}</Badge>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Score</p>
-                    <p className="font-bold text-orange-500">{l.score}</p>
+            {STATUS_ORDER.map((s) => {
+              const items = leads.filter((l) => l.status === s);
+              const pct = leads.length ? (items.length / leads.length) * 100 : 0;
+              return (
+                <div key={s}>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="font-medium">{STATUS_LABELS[s]}</span>
+                    <span className="text-muted-foreground">{items.length} leads</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
-              </Link>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Performance por Corretor</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            {MOCK_CORRETORES.map((c) => (
-              <div key={c.nome} className="rounded-lg border p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-medium">{c.nome}</p>
-                  <Badge>{c.conversao}% conversão</Badge>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><span className="text-muted-foreground">Leads:</span> <span className="font-medium">{c.leads}</span></div>
-                  <div><span className="text-muted-foreground">Vendas:</span> <span className="font-medium">{c.vendas}</span></div>
-                </div>
-                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div className="h-full bg-primary transition-all" style={{ width: `${c.conversao}%` }} />
-                </div>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2"><CalendarClock className="h-5 w-5" />Próximos compromissos</CardTitle>
+            <Link to="/crm/agenda" className="text-xs text-primary hover:underline">Ver tudo</Link>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {upcoming.length === 0 && <p className="text-sm text-muted-foreground">Nenhum compromisso próximo.</p>}
+            {upcoming.map((a) => (
+              <div key={a.id} className="rounded-lg border p-3">
+                <p className="text-sm font-medium">{a.titulo}</p>
+                <p className="text-xs text-muted-foreground">
+                  {format(new Date(a.data), "dd/MM", { locale: ptBR })} {a.hora ? `às ${String(a.hora).slice(0, 5)}` : ""}
+                </p>
               </div>
             ))}
           </CardContent>
@@ -96,19 +75,32 @@ export default function CrmDashboard() {
       </div>
 
       <Card className="mt-6">
-        <CardHeader><CardTitle>Próximas atividades</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          {MOCK_LEADS.filter(l => l.proximoFollowUp).slice(0, 5).map(l => (
-            <div key={l.id} className="flex items-center justify-between rounded-lg border p-3">
-              <div>
-                <p className="font-medium">{l.nome}</p>
-                <p className="text-xs text-muted-foreground">Follow-up: {format(new Date(l.proximoFollowUp!), "dd 'de' MMM", { locale: ptBR })}</p>
-              </div>
-              <Button size="sm" variant="outline" asChild><Link to={`/crm/leads/${l.id}`}>Abrir</Link></Button>
-            </div>
-          ))}
+        <CardHeader><CardTitle>Leads recentes</CardTitle></CardHeader>
+        <CardContent>
+          {isLoading && <p className="text-sm text-muted-foreground">Carregando…</p>}
+          <div className="space-y-2">
+            {leads.slice(0, 6).map((l) => (
+              <Link key={l.id} to={`/crm/leads/${l.id}`} className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50">
+                <div>
+                  <p className="font-medium">{l.nome}</p>
+                  <p className="text-xs text-muted-foreground">{l.tipo_imovel || "—"} • {formatCurrency(l.valor_aproximado_imovel)}</p>
+                </div>
+                <Badge variant="outline" className={STATUS_COLORS[l.status]}>{STATUS_LABELS[l.status]}</Badge>
+              </Link>
+            ))}
+            {!isLoading && leads.length === 0 && <p className="text-sm text-muted-foreground">Nenhum lead cadastrado ainda.</p>}
+          </div>
         </CardContent>
       </Card>
     </CrmLayout>
+  );
+}
+
+function KPI({ label, value, icon: Icon }: { label: string; value: number | string; icon: any }) {
+  return (
+    <Card><CardContent className="flex items-center justify-between p-5">
+      <div><p className="text-xs uppercase text-muted-foreground">{label}</p><p className="text-2xl font-bold mt-1">{value}</p></div>
+      <Icon className="h-8 w-8 text-primary/40" />
+    </CardContent></Card>
   );
 }
