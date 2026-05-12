@@ -118,6 +118,323 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_agenda: {
+        Row: {
+          concluido: boolean | null
+          created_at: string
+          data: string
+          hora: string | null
+          id: string
+          lead_id: string | null
+          observacoes: string | null
+          responsavel_id: string | null
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          concluido?: boolean | null
+          created_at?: string
+          data: string
+          hora?: string | null
+          id?: string
+          lead_id?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          tipo?: string
+          titulo: string
+        }
+        Update: {
+          concluido?: boolean | null
+          created_at?: string
+          data?: string
+          hora?: string | null
+          id?: string
+          lead_id?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_agenda_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "crm_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_automation_logs: {
+        Row: {
+          automation_id: string | null
+          created_at: string
+          id: string
+          lead_id: string | null
+          resultado: string | null
+        }
+        Insert: {
+          automation_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          resultado?: string | null
+        }
+        Update: {
+          automation_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          resultado?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_automation_logs_automation_id_fkey"
+            columns: ["automation_id"]
+            isOneToOne: false
+            referencedRelation: "crm_automations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_automation_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "crm_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_automations: {
+        Row: {
+          ativa: boolean | null
+          created_at: string
+          delay_dias: number | null
+          execucoes: number | null
+          id: string
+          nome: string
+          template_id: string | null
+          trigger: Database["public"]["Enums"]["crm_automation_trigger"]
+        }
+        Insert: {
+          ativa?: boolean | null
+          created_at?: string
+          delay_dias?: number | null
+          execucoes?: number | null
+          id?: string
+          nome: string
+          template_id?: string | null
+          trigger: Database["public"]["Enums"]["crm_automation_trigger"]
+        }
+        Update: {
+          ativa?: boolean | null
+          created_at?: string
+          delay_dias?: number | null
+          execucoes?: number | null
+          id?: string
+          nome?: string
+          template_id?: string | null
+          trigger?: Database["public"]["Enums"]["crm_automation_trigger"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_automations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "crm_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_imoveis_enviados: {
+        Row: {
+          enviado_em: string
+          enviado_por: string | null
+          id: string
+          imovel_id: string
+          lead_id: string
+        }
+        Insert: {
+          enviado_em?: string
+          enviado_por?: string | null
+          id?: string
+          imovel_id: string
+          lead_id: string
+        }
+        Update: {
+          enviado_em?: string
+          enviado_por?: string | null
+          id?: string
+          imovel_id?: string
+          lead_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_imoveis_enviados_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "crm_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_interactions: {
+        Row: {
+          created_at: string
+          criado_por: string | null
+          data: string
+          id: string
+          lead_id: string
+          resumo: string | null
+          tipo: Database["public"]["Enums"]["crm_interaction_type"]
+        }
+        Insert: {
+          created_at?: string
+          criado_por?: string | null
+          data?: string
+          id?: string
+          lead_id: string
+          resumo?: string | null
+          tipo: Database["public"]["Enums"]["crm_interaction_type"]
+        }
+        Update: {
+          created_at?: string
+          criado_por?: string | null
+          data?: string
+          id?: string
+          lead_id?: string
+          resumo?: string | null
+          tipo?: Database["public"]["Enums"]["crm_interaction_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_interactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "crm_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_leads: {
+        Row: {
+          bairro_pref: string | null
+          created_at: string
+          email: string | null
+          id: string
+          interesse: Database["public"]["Enums"]["crm_interesse"] | null
+          localizacao: string | null
+          metragem_max: number | null
+          metragem_min: number | null
+          nome: string
+          observacoes: string | null
+          origem: Database["public"]["Enums"]["crm_origem"]
+          proximo_followup: string | null
+          quartos_pref: number | null
+          responsavel_id: string | null
+          score: number
+          status: Database["public"]["Enums"]["crm_lead_status"]
+          tags: string[] | null
+          telefone: string | null
+          tipo_imovel: string | null
+          ultimo_contato: string | null
+          updated_at: string
+          user_id: string | null
+          valor_aproximado_imovel: number | null
+          valor_max: number | null
+          valor_min: number | null
+        }
+        Insert: {
+          bairro_pref?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          interesse?: Database["public"]["Enums"]["crm_interesse"] | null
+          localizacao?: string | null
+          metragem_max?: number | null
+          metragem_min?: number | null
+          nome: string
+          observacoes?: string | null
+          origem?: Database["public"]["Enums"]["crm_origem"]
+          proximo_followup?: string | null
+          quartos_pref?: number | null
+          responsavel_id?: string | null
+          score?: number
+          status?: Database["public"]["Enums"]["crm_lead_status"]
+          tags?: string[] | null
+          telefone?: string | null
+          tipo_imovel?: string | null
+          ultimo_contato?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_aproximado_imovel?: number | null
+          valor_max?: number | null
+          valor_min?: number | null
+        }
+        Update: {
+          bairro_pref?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          interesse?: Database["public"]["Enums"]["crm_interesse"] | null
+          localizacao?: string | null
+          metragem_max?: number | null
+          metragem_min?: number | null
+          nome?: string
+          observacoes?: string | null
+          origem?: Database["public"]["Enums"]["crm_origem"]
+          proximo_followup?: string | null
+          quartos_pref?: number | null
+          responsavel_id?: string | null
+          score?: number
+          status?: Database["public"]["Enums"]["crm_lead_status"]
+          tags?: string[] | null
+          telefone?: string | null
+          tipo_imovel?: string | null
+          ultimo_contato?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_aproximado_imovel?: number | null
+          valor_max?: number | null
+          valor_min?: number | null
+        }
+        Relationships: []
+      }
+      crm_templates: {
+        Row: {
+          anexos: Json | null
+          ativo: boolean | null
+          canal: string
+          created_at: string
+          id: string
+          incluir_fotos_imovel: boolean | null
+          mensagem: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          anexos?: Json | null
+          ativo?: boolean | null
+          canal?: string
+          created_at?: string
+          id?: string
+          incluir_fotos_imovel?: boolean | null
+          mensagem: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          anexos?: Json | null
+          ativo?: boolean | null
+          canal?: string
+          created_at?: string
+          id?: string
+          incluir_fotos_imovel?: boolean | null
+          mensagem?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       eventos: {
         Row: {
           created_at: string | null
@@ -525,6 +842,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_crm_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -535,6 +853,32 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "gestor"
+      crm_automation_trigger:
+        | "lead_novo"
+        | "inativo_7d"
+        | "imovel_novo"
+        | "pos_visita"
+        | "proposta_enviada"
+      crm_interaction_type:
+        | "ligacao"
+        | "whatsapp"
+        | "email"
+        | "visita"
+        | "proposta"
+        | "nota"
+      crm_interesse: "comprar" | "alugar" | "investir"
+      crm_lead_status:
+        | "novo"
+        | "atendimento"
+        | "proposta"
+        | "fechado"
+        | "perdido"
+      crm_origem:
+        | "cadastro_site"
+        | "manual"
+        | "classificado"
+        | "contato"
+        | "importado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -663,6 +1007,36 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "gestor"],
+      crm_automation_trigger: [
+        "lead_novo",
+        "inativo_7d",
+        "imovel_novo",
+        "pos_visita",
+        "proposta_enviada",
+      ],
+      crm_interaction_type: [
+        "ligacao",
+        "whatsapp",
+        "email",
+        "visita",
+        "proposta",
+        "nota",
+      ],
+      crm_interesse: ["comprar", "alugar", "investir"],
+      crm_lead_status: [
+        "novo",
+        "atendimento",
+        "proposta",
+        "fechado",
+        "perdido",
+      ],
+      crm_origem: [
+        "cadastro_site",
+        "manual",
+        "classificado",
+        "contato",
+        "importado",
+      ],
     },
   },
 } as const
