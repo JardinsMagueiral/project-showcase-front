@@ -10,6 +10,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
 
+function traduzirErroAuth(msg: string): string {
+  const map: Record<string, string> = {
+    "You can only update your password from the recovery flow": "Você só pode redefinir a senha através do link de recuperação.",
+    "Your password has been updated": "Sua senha foi atualizada com sucesso.",
+    "Auth session missing": "Sessão de autenticação ausente. Tente solicitar um novo link.",
+    "Token has expired or is invalid": "O link expirou ou é inválido. Solicite um novo.",
+    "Invalid login credentials": "Credenciais inválidas.",
+    "User already registered": "Usuário já cadastrado.",
+    "Password should be at least 6 characters": "A senha deve ter pelo menos 6 caracteres.",
+    "Unable to validate email address: invalid format": "E-mail inválido.",
+    "For security purposes, you can only request this after": "Por segurança, aguarde antes de solicitar novamente.",
+  };
+  return map[msg] || "Ocorreu um erro. Tente novamente.";
+}
+
 export default function RedefinirSenha() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -47,7 +62,9 @@ export default function RedefinirSenha() {
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     if (error) {
-      toast({ title: "Erro ao redefinir senha", description: error.message, variant: "destructive" });
+      const mensagem = traduzirErroAuth(error.message);
+      toast({ title: "Erro ao redefinir senha", description: mensagem, variant: "destructive" });
+      console.error("Erro raw Supabase:", error.message);
     } else {
       toast({ title: "Senha redefinida com sucesso!" });
       navigate("/login");
