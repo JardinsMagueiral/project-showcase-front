@@ -58,7 +58,7 @@ export default function CrmTemplates() {
     if (!file) return;
     const path = `${Date.now()}_${file.name}`;
     const { error } = await supabase.storage.from("crm-anexos").upload(path, file);
-    if (error) return toast({ title: "Erro ao subir", description: error.message, variant: "destructive" });
+    if (error) return toast({ title: "Erro ao subir", description: safeDbError(error, "Não foi possível enviar o arquivo."), variant: "destructive" });
     const { data } = supabase.storage.from("crm-anexos").getPublicUrl(path);
     setForm((f: any) => ({ ...f, anexos: [...f.anexos, { tipo: "arquivo", url: data.publicUrl, nome: file.name }] }));
     e.target.value = "";
