@@ -15,6 +15,7 @@ import { PLACEHOLDERS } from "@/lib/crmTypes";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
+import { safeDbError } from "@/lib/errorMessages";
 
 interface Anexo { tipo: "arquivo" | "link"; url: string; nome: string }
 
@@ -40,7 +41,7 @@ export default function CrmTemplates() {
     } else {
       ({ error } = await supabase.from("crm_templates" as any).insert(payload));
     }
-    if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+    if (error) return toast({ title: "Erro", description: safeDbError(error), variant: "destructive" });
     qc.invalidateQueries({ queryKey: ["crm_templates"] });
     setOpen(false);
     toast({ title: editing ? "Template atualizado" : "Template criado" });
@@ -57,7 +58,7 @@ export default function CrmTemplates() {
     if (!file) return;
     const path = `${Date.now()}_${file.name}`;
     const { error } = await supabase.storage.from("crm-anexos").upload(path, file);
-    if (error) return toast({ title: "Erro ao subir", description: error.message, variant: "destructive" });
+    if (error) return toast({ title: "Erro ao subir", description: safeDbError(error, "Não foi possível enviar o arquivo."), variant: "destructive" });
     const { data } = supabase.storage.from("crm-anexos").getPublicUrl(path);
     setForm((f: any) => ({ ...f, anexos: [...f.anexos, { tipo: "arquivo", url: data.publicUrl, nome: file.name }] }));
     e.target.value = "";

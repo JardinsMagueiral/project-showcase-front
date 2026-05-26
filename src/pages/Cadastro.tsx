@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { safeAuthError } from "@/lib/errorMessages";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, UserPlus, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
@@ -73,7 +74,7 @@ export default function Cadastro() {
     });
 
     if (error) {
-      toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao cadastrar", description: safeAuthError(error), variant: "destructive" });
     } else {
       toast({ title: "Conta criada!", description: "Verifique seu e-mail para confirmar o cadastro." });
       navigate("/login");

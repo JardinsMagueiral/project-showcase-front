@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { safeAuthError } from "@/lib/errorMessages";
 import { Loader2, LogIn, Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
@@ -28,7 +29,7 @@ export default function Login() {
     setLoading(true);
     const { error } = await signIn(email, password);
     if (error) {
-      toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao entrar", description: safeAuthError(error), variant: "destructive" });
     } else {
       toast({ title: "Bem-vindo!" });
       navigate("/admin");

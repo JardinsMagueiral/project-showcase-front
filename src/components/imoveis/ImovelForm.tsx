@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import { safeDbError } from "@/lib/errorMessages";
 import { Loader2, Upload, MessageCircle, CheckCircle } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
@@ -260,7 +261,7 @@ export function ImovelForm({ isAdmin = false, initialData, existingPhotos: initi
         navigate("/admin/imoveis");
       }
     } catch (error: any) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao salvar", description: safeDbError(error), variant: "destructive" });
     }
     setLoading(false);
   };

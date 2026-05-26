@@ -14,6 +14,7 @@ import { TRIGGER_LABELS, type AutomationTrigger } from "@/lib/crmTypes";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
+import { safeDbError } from "@/lib/errorMessages";
 
 export default function CrmAutomacoes() {
   const { data: automations = [] } = useAutomations();
@@ -25,7 +26,7 @@ export default function CrmAutomacoes() {
   const save = async () => {
     if (!form.nome) return toast({ title: "Nome obrigatório", variant: "destructive" });
     const { error } = await supabase.from("crm_automations" as any).insert({ ...form, template_id: form.template_id || null });
-    if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+    if (error) return toast({ title: "Erro", description: safeDbError(error), variant: "destructive" });
     qc.invalidateQueries({ queryKey: ["crm_automations"] });
     setOpen(false);
     setForm({ nome: "", trigger: "lead_novo", template_id: "", delay_dias: 0, ativa: true });
