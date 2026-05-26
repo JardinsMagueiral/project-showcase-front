@@ -41,7 +41,7 @@ export default function CrmTemplates() {
     } else {
       ({ error } = await supabase.from("crm_templates" as any).insert(payload));
     }
-    if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+    if (error) return toast({ title: "Erro", description: safeDbError(error), variant: "destructive" });
     qc.invalidateQueries({ queryKey: ["crm_templates"] });
     setOpen(false);
     toast({ title: editing ? "Template atualizado" : "Template criado" });
