@@ -261,7 +261,7 @@ export function ImovelForm({ isAdmin = false, initialData, existingPhotos: initi
         navigate("/admin/imoveis");
       }
     } catch (error: any) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao salvar", description: safeDbError(error), variant: "destructive" });
     }
     setLoading(false);
   };
