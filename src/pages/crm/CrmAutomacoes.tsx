@@ -14,6 +14,7 @@ import { TRIGGER_LABELS, type AutomationTrigger } from "@/lib/crmTypes";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
+import { safeDbError } from "@/lib/errorMessages";
 
 export default function CrmAutomacoes() {
   const { data: automations = [] } = useAutomations();
