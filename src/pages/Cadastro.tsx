@@ -74,7 +74,7 @@ export default function Cadastro() {
     });
 
     if (error) {
-      toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao cadastrar", description: safeAuthError(error), variant: "destructive" });
     } else {
       toast({ title: "Conta criada!", description: "Verifique seu e-mail para confirmar o cadastro." });
       navigate("/login");
