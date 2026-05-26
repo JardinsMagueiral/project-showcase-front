@@ -26,7 +26,7 @@ export default function CrmAgenda() {
   const save = async () => {
     if (!form.titulo || !form.data) return toast({ title: "Preencha título e data", variant: "destructive" });
     const { error } = await supabase.from("crm_agenda" as any).insert({ ...form, lead_id: form.lead_id || null, hora: form.hora || null });
-    if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+    if (error) return toast({ title: "Erro", description: safeDbError(error), variant: "destructive" });
     qc.invalidateQueries({ queryKey: ["crm_agenda"] });
     setOpen(false);
     setForm({ titulo: "", tipo: "tarefa", data: "", hora: "", lead_id: "" });
