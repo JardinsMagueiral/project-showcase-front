@@ -14,6 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format, isToday, isTomorrow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
+import { safeDbError } from "@/lib/errorMessages";
 
 export default function CrmAgenda() {
   const { data: agenda = [] } = useAgenda();
