@@ -15,6 +15,7 @@ import { PLACEHOLDERS } from "@/lib/crmTypes";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
+import { safeDbError } from "@/lib/errorMessages";
 
 interface Anexo { tipo: "arquivo" | "link"; url: string; nome: string }
 
