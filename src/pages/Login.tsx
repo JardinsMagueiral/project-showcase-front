@@ -29,7 +29,7 @@ export default function Login() {
     setLoading(true);
     const { error } = await signIn(email, password);
     if (error) {
-      toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao entrar", description: safeAuthError(error), variant: "destructive" });
     } else {
       toast({ title: "Bem-vindo!" });
       navigate("/admin");
